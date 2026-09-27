@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #040B16;
+  --color-panel: rgba(10, 20, 35, 0.6);
+  --color-panel-solid: #0A1423;
+  --color-panel-2: rgba(20, 40, 70, 0.4);
+  --color-line: rgba(255, 255, 255, 0.1);
+  --color-text: #FFFFFF;
+  --color-muted: #94A3B8;
+  
+  --color-neon-blue: #38BDF8;
+  --color-neon-blue-glow: rgba(56, 189, 248, 0.4);
+  
+  --font-sans: "Inter", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-ink text-text font-sans m-0 antialiased overflow-x-hidden;
+  }
+}
+
+@layer utilities {
+  .neon-button {
+    @apply bg-neon-blue text-ink font-semibold px-6 py-3 rounded-full flex items-center gap-2 hover:bg-neon-blue/90 transition-all shadow-[0_0_20px_rgba(56,189,248,0.5)];
+  }
+  
+  .glass-card-3d {
+    @apply bg-[#f0f4f8] backdrop-blur-xl rounded-2xl p-6 relative;
+    box-shadow: 0 0 50px rgba(56, 189, 248, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+  }
+  
+  .glass-card-3d::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 3px;
+    background: linear-gradient(135deg, rgba(56, 189, 248, 1) 0%, transparent 30%, transparent 70%, rgba(56, 189, 248, 0.8) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
