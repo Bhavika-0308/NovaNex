@@ -82,49 +82,76 @@ export default function Home() {
 
             {/* HOW IT WORKS SECTION */}
             <div className="min-h-screen py-32 space-y-24">
-              <div className="space-y-4">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="space-y-4"
+              >
                 <h2 className="text-4xl font-bold">How it works</h2>
                 <p className="text-muted text-lg">Three simple steps to financial clarity.</p>
-              </div>
+              </motion.div>
 
               <div className="space-y-16">
-                <div className="flex gap-6 items-start group">
-                  <div className="w-16 h-16 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-neon-blue group-hover:bg-neon-blue/20 group-hover:border-neon-blue/50 transition-all">
+                <motion.div 
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="flex gap-6 items-start group"
+                >
+                  <div className="w-16 h-16 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-neon-blue group-hover:bg-neon-blue/20 group-hover:border-neon-blue/50 group-hover:scale-110 transition-all duration-300 shadow-[0_0_0_rgba(56,189,248,0)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.3)]">
                     <Search className="w-7 h-7" />
                   </div>
                   <div className="space-y-3 pt-2">
                     <h3 className="text-2xl font-semibold">1. Upload your policy</h3>
                     <p className="text-muted leading-relaxed max-w-md">Securely drop in your PDF. Our AI instantly extracts the exact coverage terms, sub-limits, deductibles, and hidden exclusions.</p>
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="flex gap-6 items-start group">
-                  <div className="w-16 h-16 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-neon-blue group-hover:bg-neon-blue/20 group-hover:border-neon-blue/50 transition-all">
+                <motion.div 
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="flex gap-6 items-start group"
+                >
+                  <div className="w-16 h-16 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-neon-blue group-hover:bg-neon-blue/20 group-hover:border-neon-blue/50 group-hover:scale-110 transition-all duration-300 shadow-[0_0_0_rgba(56,189,248,0)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.3)]">
                     <Zap className="w-7 h-7" />
                   </div>
                   <div className="space-y-3 pt-2">
                     <h3 className="text-2xl font-semibold">2. Ask any question</h3>
                     <p className="text-muted leading-relaxed max-w-md">Chat with your document. Ask "Is robotic surgery covered?" and get an instant answer backed by a direct citation to the page and clause.</p>
                   </div>
-                </div>
+                </motion.div>
 
-                <div className="flex gap-6 items-start group">
-                  <div className="w-16 h-16 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-neon-blue group-hover:bg-neon-blue/20 group-hover:border-neon-blue/50 transition-all">
+                <motion.div 
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-100px" }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  className="flex gap-6 items-start group"
+                >
+                  <div className="w-16 h-16 shrink-0 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-neon-blue group-hover:bg-neon-blue/20 group-hover:border-neon-blue/50 group-hover:scale-110 transition-all duration-300 shadow-[0_0_0_rgba(56,189,248,0)] group-hover:shadow-[0_0_20px_rgba(56,189,248,0.3)]">
                     <CheckCircle className="w-7 h-7" />
                   </div>
                   <div className="space-y-3 pt-2">
                     <h3 className="text-2xl font-semibold">3. Estimate treatment cost</h3>
                     <p className="text-muted leading-relaxed max-w-md">Input a diagnosis. We combine your policy rules with local hospital pricing to predict exactly what you'll pay out-of-pocket.</p>
                   </div>
-                </div>
+                </motion.div>
               </div>
             </div>
 
             {/* CALL TO ACTION */}
             <div className="py-32">
-              <div className="glass-card-3d p-12 !shadow-none border-neon-blue/30 bg-neon-blue/5">
-                <h2 className="text-4xl font-bold mb-6">Ready to decode your policy?</h2>
-                <Link to="/login" className="inline-block neon-button w-max mt-4">
+              <div className="rounded-3xl p-12 border border-neon-blue/30 bg-gradient-to-br from-neon-blue/20 to-transparent shadow-[0_0_40px_rgba(56,189,248,0.15)] relative overflow-hidden">
+                {/* Decorative glow inside */}
+                <div className="absolute -top-24 -right-24 w-64 h-64 bg-neon-blue/30 blur-[60px] rounded-full pointer-events-none"></div>
+                
+                <h2 className="text-4xl font-bold mb-6 relative z-10 text-white">Ready to decode your policy?</h2>
+                <Link to="/login" className="inline-block neon-button w-max mt-4 relative z-10">
                   Start for free <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
