@@ -1,7 +1,7 @@
 import Nav from '../components/Nav';
 import { BlurText } from '../components/BlurText';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ArrowRight, Play, Shield, Activity, Clock, AlertTriangle, IndianRupee, FileWarning, Search, Zap, CheckCircle } from 'lucide-react';
+import { ArrowRight, Play, Shield, Activity, Clock, AlertTriangle, IndianRupee, FileWarning, Search, Zap, CheckCircle, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useRef } from 'react';
 
@@ -37,18 +37,11 @@ export default function Home() {
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 w-full relative">
           
           {/* Left Content (Scrolls naturally) */}
-          <div className="w-full lg:w-1/2 pb-[30vh]">
+          <div className="w-full lg:w-1/2 pb-12">
             
             {/* HERO SECTION (Text) */}
             <div className="space-y-8 min-h-[80vh] flex flex-col justify-center">
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.5 }}
-                className="text-neon-blue tracking-[0.2em] text-xs font-bold uppercase"
-              >
-                AI-Powered Insurance Intelligence
-              </motion.div>
+
               
               <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-bold leading-[1.1] tracking-tight">
                 Your Insurance. <br />
@@ -81,16 +74,23 @@ export default function Home() {
             </div>
 
             {/* HOW IT WORKS SECTION */}
-            <div className="min-h-screen py-32 space-y-24">
+            <div className="py-12 space-y-24">
               <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
                 className="space-y-4"
               >
-                <h2 className="text-4xl font-bold">How it works</h2>
-                <p className="text-muted text-lg">Three simple steps to financial clarity.</p>
+                <BlurText text="How it works" className="text-4xl font-bold" />
+                <motion.p 
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  viewport={{ once: true }}
+                  className="text-muted text-lg"
+                >
+                  Three simple steps to financial clarity.
+                </motion.p>
               </motion.div>
 
               <div className="space-y-16">
@@ -144,23 +144,10 @@ export default function Home() {
               </div>
             </div>
 
-            {/* CALL TO ACTION */}
-            <div className="py-32">
-              <div className="rounded-3xl p-12 border border-neon-blue/30 bg-gradient-to-br from-neon-blue/20 to-transparent shadow-[0_0_40px_rgba(56,189,248,0.15)] relative overflow-hidden">
-                {/* Decorative glow inside */}
-                <div className="absolute -top-24 -right-24 w-64 h-64 bg-neon-blue/30 blur-[60px] rounded-full pointer-events-none"></div>
-                
-                <h2 className="text-4xl font-bold mb-6 relative z-10 text-white">Ready to decode your policy?</h2>
-                <Link to="/login" className="inline-block neon-button w-max mt-4 relative z-10">
-                  Start for free <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            </div>
-
           </div>
-          
+
           {/* Right Content: Sticky 3D Floating Policy Card */}
-          <div className="hidden lg:block w-1/2 relative h-[250vh]">
+          <div className="hidden lg:block w-1/2 relative h-auto">
             <div className="sticky top-0 h-screen w-full flex items-center justify-center perspective-1000">
               
               {/* Glowing pedestal base */}
@@ -243,6 +230,101 @@ export default function Home() {
             </div>
           </div>
           
+        </div>
+
+        {/* FULL WIDTH SECTIONS BELOW SCROLL BLOCK */}
+        <div className="max-w-6xl mx-auto pb-32">
+          {/* BENTO BOX CAPABILITIES SECTION */}
+          <div className="py-24 space-y-12">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              className="space-y-4 text-center"
+            >
+              <BlurText text="Built for clarity" className="text-4xl font-bold" />
+              <p className="text-muted text-lg">Everything you need to navigate your healthcare.</p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              
+              {/* Bento Card 1 */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-colors group relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-neon-blue/10 blur-[40px] rounded-full group-hover:bg-neon-blue/20 transition-colors"></div>
+                <FileWarning className="w-8 h-8 text-neon-blue mb-6" />
+                <h3 className="text-xl font-bold mb-3">Exclusion Detection</h3>
+                <p className="text-muted text-sm leading-relaxed">Our AI automatically flags named exclusions like cosmetic surgeries or non-medical consumables so you aren't blindsided by rejected claims.</p>
+              </motion.div>
+
+              {/* Bento Card 2 */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-colors group relative overflow-hidden"
+              >
+                <div className="absolute bottom-0 right-0 w-32 h-32 bg-neon-blue/10 blur-[40px] rounded-full group-hover:bg-neon-blue/20 transition-colors"></div>
+                <Clock className="w-8 h-8 text-neon-blue mb-6" />
+                <h3 className="text-xl font-bold mb-3">Waiting Period Tracking</h3>
+                <p className="text-muted text-sm leading-relaxed">Instantly know if your pre-existing conditions or specific treatments (like maternity) have cleared their mandatory waiting periods.</p>
+              </motion.div>
+
+              {/* Bento Card 3 */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 transition-colors group relative overflow-hidden"
+              >
+                <div className="absolute top-0 right-0 w-32 h-32 bg-neon-blue/10 blur-[40px] rounded-full group-hover:bg-neon-blue/20 transition-colors"></div>
+                <Activity className="w-8 h-8 text-neon-blue mb-6" />
+                <h3 className="text-xl font-bold mb-3">Live Scenario Testing</h3>
+                <p className="text-muted text-sm leading-relaxed">Change room types or surgical methods on the fly and watch your out-of-pocket estimates adjust in real time.</p>
+              </motion.div>
+
+              {/* Bento Card 4 (Full Width) */}
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.3 }}
+                className="md:col-span-2 lg:col-span-3 bg-gradient-to-br from-white/5 to-transparent border border-white/10 rounded-2xl p-8 hover:border-neon-blue/30 transition-colors group relative overflow-hidden flex flex-col md:flex-row items-center gap-8"
+              >
+                <div className="flex-1 space-y-4 relative z-10">
+                  <Shield className="w-8 h-8 text-neon-blue mb-4" />
+                  <h3 className="text-xl font-bold">Absolute Data Privacy</h3>
+                  <p className="text-muted text-sm leading-relaxed max-w-md">Your health and financial data is strictly confidential. Documents are processed using zero-retention infrastructure and are never used to train external AI models.</p>
+                </div>
+                <div className="w-full md:w-1/3 h-32 rounded-xl bg-ink/50 border border-white/5 flex items-center justify-center relative z-10 shadow-inner">
+                  <div className="flex items-center gap-3 text-neon-blue font-mono text-sm">
+                    <Lock className="w-4 h-4" />
+                    Encrypted Workspace
+                  </div>
+                </div>
+              </motion.div>
+
+            </div>
+          </div>
+
+          {/* CALL TO ACTION */}
+          <div className="py-24 max-w-4xl mx-auto text-center">
+            <div className="rounded-3xl p-16 border border-neon-blue/30 bg-gradient-to-br from-neon-blue/20 to-transparent shadow-[0_0_50px_rgba(56,189,248,0.15)] relative overflow-hidden">
+              <div className="absolute -top-32 -right-32 w-[400px] h-[400px] bg-neon-blue/30 blur-[80px] rounded-full pointer-events-none"></div>
+              
+              <h2 className="text-4xl lg:text-5xl font-bold mb-8 relative z-10 text-white tracking-tight">Ready to decode your policy?</h2>
+              <Link to="/login" className="inline-flex neon-button relative z-10 text-lg px-8 py-4">
+                Start for free <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
+            </div>
+          </div>
         </div>
       </main>
       

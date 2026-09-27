@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, MessageSquare, Calculator, FileText, Send, Settings, LogOut, FileSearch, Zap, CheckCircle, AlertTriangle, ChevronRight, Activity, Paperclip } from 'lucide-react';
+import { Shield, MessageSquare, Calculator, FileText, Send, Settings, LogOut, FileSearch, CheckCircle, AlertTriangle, Activity, Paperclip } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Dashboard() {
