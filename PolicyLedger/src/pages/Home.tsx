@@ -314,33 +314,51 @@ export default function Home() {
 
             </div>
           </div>
-
-          {/* CALL TO ACTION */}
-          <div className="py-24 max-w-4xl mx-auto text-center">
-            <div className="rounded-3xl p-16 border border-neon-blue/30 bg-gradient-to-br from-neon-blue/20 to-transparent shadow-[0_0_50px_rgba(56,189,248,0.15)] relative overflow-hidden">
-              <div className="absolute -top-32 -right-32 w-[400px] h-[400px] bg-neon-blue/30 blur-[80px] rounded-full pointer-events-none"></div>
-
-              <h2 className="text-4xl lg:text-5xl font-bold mb-8 relative z-10 text-white tracking-tight">Ready to decode your policy?</h2>
-              <Link to="/login" className="inline-flex neon-button relative z-10 text-lg px-8 py-4">
-                Start for free <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-            </div>
-          </div>
         </div>
       </main>
 
-      {/* Scroll indicator */}
-      <div className="fixed bottom-8 left-8 flex items-center gap-4 text-sm text-muted z-50">
-        <div className="w-6 h-10 rounded-full border border-white/20 flex justify-center pt-2">
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-1 h-1 rounded-full bg-neon-blue/80 shadow-[0_0_8px_#38BDF8]"
-          ></motion.div>
-        </div>
-        Scroll to explore
-        <div className="w-24 h-px bg-white/10 ml-2"></div>
-      </div>
+      {/* FOOTER */}
+      <footer className="border-t border-white/10 pt-16 pb-8 mt-24">
+            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+              <div className="col-span-1 md:col-span-2 space-y-4">
+                <Link to="/" className="flex items-center gap-3 group">
+                  <Logo size={32} className="opacity-80 group-hover:opacity-100 transition-opacity" />
+                  <span className="font-bold text-xl tracking-tight text-white group-hover:text-accent transition-colors">InsureSight</span>
+                </Link>
+                <p className="text-muted text-sm max-w-sm mt-4">
+                  Transforming dense health insurance policies into instant, actionable intelligence using AI.
+                </p>
+              </div>
+              
+              <div>
+                <h4 className="font-bold text-white mb-6">Product</h4>
+                <ul className="space-y-4 text-sm text-muted">
+                  <li><Link to="/features" className="hover:text-neon-blue transition-colors">Features</Link></li>
+                  <li><a href="#" className="hover:text-neon-blue transition-colors">Security</a></li>
+                  <li><a href="#" className="hover:text-neon-blue transition-colors">Pricing</a></li>
+                </ul>
+              </div>
+              
+              <div>
+                <h4 className="font-bold text-white mb-6">Company</h4>
+                <ul className="space-y-4 text-sm text-muted">
+                  <li><a href="#" className="hover:text-neon-blue transition-colors">About Us</a></li>
+                  <li><a href="#" className="hover:text-neon-blue transition-colors">Contact</a></li>
+                  <li><a href="#" className="hover:text-neon-blue transition-colors">Privacy Policy</a></li>
+                  <li><a href="#" className="hover:text-neon-blue transition-colors">Terms of Service</a></li>
+                </ul>
+              </div>
+            </div>
+            
+            <div className="max-w-7xl mx-auto px-6 border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted">
+              <p>&copy; {new Date().getFullYear()} InsureSight. All rights reserved.</p>
+              <div className="flex items-center gap-6">
+                <a href="#" className="hover:text-white transition-colors">Twitter</a>
+                <a href="#" className="hover:text-white transition-colors">LinkedIn</a>
+                <a href="#" className="hover:text-white transition-colors">GitHub</a>
+              </div>
+            </div>
+          </footer>
 
     </div>
   );

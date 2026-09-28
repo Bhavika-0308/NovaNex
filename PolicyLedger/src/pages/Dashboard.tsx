@@ -369,8 +369,15 @@ export default function Dashboard() {
         </div>
 
         <div className="p-4 border-t border-white/10 space-y-2">
-          <button className="w-full flex items-center gap-3 p-3 rounded-xl text-muted hover:bg-white/5 hover:text-text transition-all">
-            <Settings className="w-5 h-5" />
+          <button 
+            onClick={() => setActiveTab('settings')}
+            className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${
+              activeTab === 'settings'
+                ? 'bg-blue-500/15 text-blue-400 shadow-[inset_2px_0_0_#60a5fa]'
+                : 'text-muted hover:bg-white/5 hover:text-text'
+            }`}
+          >
+            <Settings className="w-5 h-5 shrink-0" />
             <span className="font-medium hidden lg:block">Settings</span>
           </button>
           <button onClick={handleSignOut} className="w-full flex items-center gap-3 p-3 rounded-xl text-muted hover:bg-red-500/20 hover:text-red-400 transition-all">
@@ -387,7 +394,7 @@ export default function Dashboard() {
         <header className="h-20 border-b border-white/10 flex items-center justify-between px-8 bg-ink/50 backdrop-blur-md z-10">
           <div className="flex items-center gap-4">
             <h1 className="text-xl font-bold">
-              {activeTab === 'chat' ? 'Policy Copilot' : activeTab === 'estimator' ? 'Treatment Cost Estimator' : 'Document Vault'}
+              {activeTab === 'chat' ? 'Policy Copilot' : activeTab === 'estimator' ? 'Treatment Cost Estimator' : activeTab === 'settings' ? 'Account Settings' : 'Document Vault'}
             </h1>
             <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium tracking-wide">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
@@ -466,60 +473,148 @@ export default function Dashboard() {
           <AnimatePresence mode="wait">
 
             {/* TAB: CHAT */}
+            {/* TAB: CHAT / OVERVIEW */}
             {activeTab === 'chat' && (
               <motion.div
                 key="chat"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute inset-0 flex flex-col p-8"
+                className="absolute inset-0 p-6 overflow-y-auto"
               >
-                <div className="flex-1 overflow-y-auto space-y-6 pb-6 pr-4 scrollbar-hide">
-                  {messages.map((msg, i) => (
-                    <div key={i} className={`flex gap-4 max-w-3xl ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
-                      <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center shadow-lg font-bold text-sm ${msg.role === 'user' ? 'bg-blue-500/20 border-2 border-blue-400/60 text-blue-400' : 'bg-white/5 border border-white/10 text-blue-400'}`}>
-                        {msg.role === 'user' ? getInitial() : <Shield className="w-5 h-5" />}
+                <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 h-full min-h-[600px] max-w-7xl mx-auto">
+                  
+                  {/* Left: Overview Dashboard */}
+                  <div className="xl:col-span-8 flex flex-col gap-6">
+                    {/* Summary Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex flex-col gap-2 relative overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
+                        <div className="absolute top-0 right-0 p-4 opacity-10"><CheckCircle className="w-16 h-16 text-green-400" /></div>
+                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Coverage</span>
+                        <span className="text-3xl font-extrabold text-slate-100">92%</span>
+                        <span className="text-xs text-green-400 font-medium">Of typical treatments</span>
                       </div>
-                      <div className={`p-4 rounded-2xl text-sm leading-relaxed ${msg.role === 'user' ? 'bg-blue-500 text-white rounded-tr-sm' : 'bg-white/5 border border-white/10 text-text rounded-tl-sm'}`}>
-                        {msg.text}
-                        {msg.role === 'ai' && i > 0 && (
-                          <div className="mt-4 pt-3 border-t border-white/10">
-                            <div className="inline-flex items-center gap-2 px-2 py-1 rounded bg-black/30 border border-white/5 text-xs text-muted hover:text-blue-400 hover:border-blue-400/50 cursor-pointer transition-colors">
-                              <FileSearch className="w-3 h-3" /> Page 14, Section 3.1 & 4.2
-                            </div>
-                          </div>
-                        )}
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex flex-col gap-2 relative overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
+                        <div className="absolute top-0 right-0 p-4 opacity-10"><AlertTriangle className="w-16 h-16 text-red-400" /></div>
+                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Not Covered</span>
+                        <span className="text-3xl font-extrabold text-slate-100">Consumables</span>
+                        <span className="text-xs text-red-400 font-medium">Always out-of-pocket</span>
+                      </div>
+                      <div className="bg-white/5 border border-white/10 rounded-2xl p-5 flex flex-col gap-2 relative overflow-hidden shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
+                        <div className="absolute top-0 right-0 p-4 opacity-10"><Clock className="w-16 h-16 text-amber-400" /></div>
+                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">Waiting Period</span>
+                        <span className="text-3xl font-extrabold text-slate-100">2 Years</span>
+                        <span className="text-xs text-amber-400 font-medium">Pre-existing conditions</span>
                       </div>
                     </div>
-                  ))}
-                  <div ref={chatEndRef} />
-                </div>
 
-                <form onSubmit={handleSendMessage} className="relative mt-auto">
-                  <div className="absolute inset-0 bg-blue-400/10 blur-xl rounded-full opacity-50 z-0 pointer-events-none" />
-                  <div className="relative z-10 bg-ink border border-white/10 rounded-xl shadow-2xl flex items-end p-2 focus-within:border-blue-400/50 transition-colors">
-                    <button type="button" className="p-3 text-muted hover:text-blue-400 transition-colors">
-                      <Paperclip className="w-5 h-5" />
-                    </button>
-                    <textarea
-                      rows={1}
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      placeholder="Ask a question about your policy..."
-                      className="flex-1 bg-transparent border-none focus:outline-none resize-none p-3 text-text placeholder:text-muted/50 max-h-32"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(e); }
-                      }}
-                    />
-                    <button
-                      type="submit"
-                      disabled={!message.trim()}
-                      className="p-3 bg-blue-500 text-white rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-400 transition-colors shadow-[0_0_15px_rgba(56,189,248,0.4)]"
-                    >
-                      <Send className="w-5 h-5" />
-                    </button>
+                    {/* Cost Visual */}
+                    <div className="bg-[#0a0f1a] border border-blue-400/20 rounded-3xl p-8 flex flex-col justify-center shadow-[0_0_50px_rgba(37,99,235,0.06)] relative overflow-hidden">
+                      <div className="absolute right-0 top-0 w-72 h-72 bg-blue-500/10 blur-[100px] rounded-full pointer-events-none"></div>
+                      <h3 className="text-sm font-bold text-slate-400 mb-8 flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5 text-blue-400" /> Estimated Treatment Payment
+                      </h3>
+                      
+                      <div className="flex flex-col md:flex-row md:items-end justify-between mb-5 gap-4">
+                        <div>
+                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5">Total Hospital Bill</p>
+                          <p className="text-4xl md:text-5xl font-extrabold text-white tracking-tight">Rs.1,50,000</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-slate-500 font-medium mb-1">Standard Appendectomy</p>
+                          <p className="text-[10px] text-slate-600">Based on historic network data</p>
+                        </div>
+                      </div>
+                      
+                      <div className="h-5 bg-white/5 rounded-full overflow-hidden flex gap-1 mb-5 shadow-inner">
+                        <motion.div className="h-full rounded-l-full" style={{ background: 'linear-gradient(90deg, #16a34a, #22c55e)', width: '85%' }} initial={{ width: 0 }} animate={{ width: '85%' }} transition={{ duration: 1.2, delay: 0.2 }} />
+                        <motion.div className="h-full rounded-r-full" style={{ background: 'linear-gradient(90deg, #dc2626, #ef4444)', width: '15%' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} />
+                      </div>
+                      
+                      <div className="flex justify-between text-sm font-semibold">
+                        <span className="flex items-center gap-2 text-green-400">
+                          <CheckCircle className="w-4 h-4" /> Insurance Pays: Rs.1,27,500
+                        </span>
+                        <span className="flex items-center gap-2 text-red-400">
+                          <BadgePercent className="w-4 h-4" /> You Pay: Rs.22,500
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Policy Insights & Chips */}
+                    <div className="flex flex-col gap-4 mt-auto pt-2">
+                      <h3 className="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-blue-400" /> Policy Copilot
+                      </h3>
+                      <div className="flex flex-wrap gap-3">
+                        {[
+                          "Is my surgery covered?",
+                          "How much will I pay?",
+                          "Does my policy have a room-rent limit?",
+                          "What is the waiting period?"
+                        ].map(q => (
+                          <button 
+                            key={q}
+                            onClick={() => setMessage(q)}
+                            className="px-5 py-2.5 bg-blue-500/10 border border-blue-400/30 text-blue-400 text-sm font-medium rounded-full hover:bg-blue-500/20 hover:border-blue-400/50 hover:-translate-y-0.5 transition-all shadow-[0_4px_14px_rgba(37,99,235,0.1)]"
+                          >
+                            {q}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </form>
+
+                  {/* Right: Chat UI */}
+                  <div className="xl:col-span-4 bg-[#080d17] border border-blue-400/20 rounded-3xl flex flex-col overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.5)] relative">
+                    <div className="p-5 border-b border-white/10 bg-gradient-to-r from-blue-500/10 to-transparent flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center border border-blue-400/50 text-blue-400 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
+                        <Brain className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-slate-200">AI Assistant</h3>
+                        <p className="text-[11px] text-green-400 flex items-center gap-1.5 font-medium mt-0.5"><span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span> Online & Ready</p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto p-5 space-y-5 scrollbar-hide">
+                      {messages.map((msg, i) => (
+                        <div key={i} className={`flex gap-3 max-w-[92%] ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}>
+                          <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center font-bold text-xs shadow-lg ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-white/10 border border-white/10 text-blue-400'}`}>
+                            {msg.role === 'user' ? getInitial() : <Shield className="w-4 h-4" />}
+                          </div>
+                          <div className={`p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-blue-500 text-white rounded-tr-sm' : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-sm'}`}>
+                            {msg.text}
+                          </div>
+                        </div>
+                      ))}
+                      <div ref={chatEndRef} />
+                    </div>
+
+                    <div className="p-4 border-t border-white/10 bg-ink/60 backdrop-blur-xl">
+                      <form onSubmit={handleSendMessage} className="relative flex items-end">
+                        <textarea
+                          rows={1}
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          placeholder="Ask about your policy..."
+                          className="flex-1 bg-[#0c1220] border border-white/10 rounded-xl focus:border-blue-400/60 focus:ring-1 focus:ring-blue-400/20 focus:outline-none resize-none px-4 py-3 text-sm text-text placeholder:text-muted max-h-32 transition-all pr-12"
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(e); }
+                          }}
+                        />
+                        <button
+                          type="submit"
+                          disabled={!message.trim()}
+                          className="absolute right-1.5 bottom-1.5 p-2 bg-blue-500 text-white rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-400 transition-colors shadow-[0_0_15px_rgba(56,189,248,0.4)]"
+                        >
+                          <Send className="w-4 h-4" />
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+
+                </div>
               </motion.div>
             )}
 
@@ -867,6 +962,72 @@ export default function Dashboard() {
                       </div>
                     ))}
                   </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* TAB: SETTINGS */}
+            {activeTab === 'settings' && (
+              <motion.div
+                key="settings"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="absolute inset-0 p-8 overflow-y-auto"
+              >
+                <div className="max-w-3xl mx-auto space-y-8">
+                  <h2 className="text-2xl font-bold">Account Settings</h2>
+                  
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
+                    <h3 className="text-lg font-bold border-b border-white/10 pb-4">Profile Information</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2 block">Display Name</label>
+                        <input 
+                          type="text" 
+                          disabled 
+                          value={getDisplayName()} 
+                          className="w-full bg-[#0d1424] border border-white/10 rounded-xl p-3 text-sm text-slate-200 opacity-70" 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-widest mb-2 block">Email Address</label>
+                        <input 
+                          type="text" 
+                          disabled 
+                          value={user?.email || ''} 
+                          className="w-full bg-[#0d1424] border border-white/10 rounded-xl p-3 text-sm text-slate-200 opacity-70" 
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-6">
+                    <h3 className="text-lg font-bold border-b border-white/10 pb-4">Preferences</h3>
+                    
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-slate-200">Email Notifications</p>
+                          <p className="text-sm text-slate-500">Receive alerts when policy updates occur.</p>
+                        </div>
+                        <div className="w-11 h-6 bg-blue-500 rounded-full relative cursor-pointer">
+                          <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full transition-transform"></div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-slate-200">Dark Mode</p>
+                          <p className="text-sm text-slate-500">Currently locked to NovaNex dark theme.</p>
+                        </div>
+                        <div className="w-11 h-6 bg-white/10 rounded-full relative cursor-not-allowed opacity-50">
+                          <div className="absolute left-1 top-1 w-4 h-4 bg-white/50 rounded-full transition-transform"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </motion.div>
             )}
