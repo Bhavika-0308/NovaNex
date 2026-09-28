@@ -1,10 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom';
+﻿import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Loader2, Shield } from 'lucide-react';
 import { useState } from 'react';
-import { auth } from '../firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import Logo from '../components/Logo';
+import { loginUser, signupUser } from '../api';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -20,46 +19,29 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+    setSignupMessage('');
     setLoading(true);
 
     try {
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, email, password);
+        await loginUser(email, password);
+        navigate('/dashboard');
       } else {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        if (name) {
-          await updateProfile(userCredential.user, { displayName: name });
-        }
+        await signupUser(email, password, name);
+
+        setSignupMessage('Account created successfully. Please sign in.');
+        setIsLogin(true);
+        setPassword('');
       }
-      navigate('/');
     } catch (err: unknown) {
-      const code = (err as { code?: string }).code ?? '';
-      if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
-        setErrorMessage('Invalid email or password. Please try again.');
-      } else if (code === 'auth/email-already-in-use') {
-        setErrorMessage('An account with this email already exists. Please log in instead.');
-      } else if (code === 'auth/weak-password') {
-        setErrorMessage('Password must be at least 6 characters long.');
-      } else if (code === 'auth/invalid-email') {
-        setErrorMessage('Please enter a valid email address.');
-      } else if (code === 'auth/operation-not-allowed') {
-        setErrorMessage('Email/password sign-in is not enabled. Please contact support.');
-      } else if (code === 'auth/too-many-requests') {
-        setErrorMessage('Too many failed attempts. Please wait a moment and try again.');
-      } else if (code === 'auth/network-request-failed') {
-        setErrorMessage('Network error. Please check your internet connection and try again.');
-      } else {
-        setErrorMessage(
-          import.meta.env.DEV
-            ? `Something went wrong. (Firebase code: ${code || 'unknown'})`
-            : 'Something went wrong. Please try again.'
-        );
-      }
+      const message =
+        err instanceof Error ? err.message : 'Something went wrong.';
+
+      setErrorMessage(message);
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen bg-ink flex font-sans text-text relative overflow-hidden">
       
@@ -192,7 +174,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md pr-12"
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                 />
                 <button
                   type="button"
@@ -244,3 +226,4 @@ export default function Login() {
     </div>
   );
 }
+

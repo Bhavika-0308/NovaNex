@@ -1,17 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, MessageSquare, Calculator, FileText, Send, Settings, LogOut,
-  FileSearch, CheckCircle, AlertTriangle, Paperclip, User as UserIcon,
+  CheckCircle, AlertTriangle, Paperclip, User as UserIcon,
   Mail, ChevronDown, Sparkles, Brain, TrendingUp, Zap, Clock,
   BadgePercent, BarChart3, ScanLine
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { auth } from '../firebase';
-import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import Logo from '../components/Logo';
+import {
+  getCurrentUser,
+  logoutUser,
+  uploadPolicy,
+  getPolicyStatus,
+  getPolicyOverview,
+  askPolicy,
+} from '../api';
 
-/* ─────────────────────────── Types ─────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 interface EstimateResult {
   totalBill: number;
   covered: number;
@@ -103,14 +109,14 @@ function computeEstimate(
     `${hosp.city} hospitals show ${hosp.multiplier > 1.1 ? 'above-average' : 'competitive'} billing rates for this procedure.`,
     roomOutOfPocket > 0
       ? `Upgrading to Twin Sharing room could save you Rs.${((room.ratePerDay - ROOM_RATES['Twin Sharing'].ratePerDay) * days).toLocaleString('en-IN')} in co-pay.`
-      : 'Room rent is fully within policy limits — no co-pay triggered.',
+      : 'Room rent is fully within policy limits â€” no co-pay triggered.',
     'Estimated pre-authorisation approval time: 4-6 hours for this procedure category.',
   ];
 
   return { totalBill, covered: coveredAmount, outOfPocket, confidence, withinLimits, breakdown, aiInsights };
 }
 
-/* ─────────────────────────── Scanning animation ─────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Scanning animation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function AIScanningOverlay({ onDone }: { onDone: () => void }) {
   useEffect(() => {
     const t = setTimeout(onDone, 2200);
@@ -167,7 +173,7 @@ function AIScanningOverlay({ onDone }: { onDone: () => void }) {
   );
 }
 
-/* ─────────────────────────── Confidence Meter ─────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Confidence Meter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function ConfidenceMeter({ value }: { value: number }) {
   const color = value >= 85 ? '#22c55e' : value >= 70 ? '#f59e0b' : '#ef4444';
   return (
@@ -191,31 +197,20 @@ function ConfidenceMeter({ value }: { value: number }) {
   );
 }
 
-interface MessageItem {
-  role: 'user' | 'ai';
-  text: string;
-  confidence?: number;
-  citations?: Array<{ text: string; page: number; section?: string }>;
-  missing_information?: string[];
-  isLoading?: boolean;
-}
-
-/* ─────────────────────────── Main Component ─────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Main Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('chat');
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState<MessageItem[]>([
-    {
-      role: 'ai',
-      text: 'Hello! I have successfully analyzed your Comprehensive Health policy (HP-458732). What would you like to know about your coverage?',
-      confidence: 95,
-      citations: [
-        { text: "Comprehensive Health Guard Policy Schedule HP-458732.", page: 1, section: "POLICY SCHEDULE" }
-      ]
-    }
+  const [messages, setMessages] = useState([
+    { role: 'ai', text: 'Hello! I have successfully analyzed your Comprehensive Health policy (HP-458732). What would you like to know about your coverage?' }
   ]);
+  type BackendUser = {
+  id: string;
+  email: string;
+  full_name?: string;
+};
 
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<BackendUser | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -235,7 +230,7 @@ export default function Dashboard() {
     {
       id: 'doc-1',
       title: 'Comprehensive Health',
-      details: 'HP-458732 · Uploaded Oct 24',
+      details: 'HP-458732 Â· Uploaded Oct 24',
       status: 'Fully Extracted',
       statusColor: 'text-blue-400',
       pages: '42 Pages',
@@ -245,7 +240,7 @@ export default function Dashboard() {
     {
       id: 'doc-2',
       title: 'Corporate Group Policy',
-      details: 'CG-992144 · Uploaded Sep 12',
+      details: 'CG-992144 Â· Uploaded Sep 12',
       status: 'Fully Extracted',
       statusColor: 'text-green-400',
       pages: '18 Pages',
@@ -254,67 +249,105 @@ export default function Dashboard() {
     }
   ]);
   const [isUploading, setIsUploading] = useState(false);
+  const [policyId, setPolicyId] = useState<string | null>(
+    localStorage.getItem('policywise_policy_id')
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeDocument = documents.find(d => d.isActive) || documents[0];
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
+
     if (!file) return;
-    
+
+    if (file.type !== 'application/pdf') {
+      alert('Please upload a PDF policy document.');
+      return;
+    }
+
     setIsUploading(true);
-    const newPolicyId = `POL-${Math.floor(100000 + Math.random() * 900000)}`;
 
     try {
-      const formData = new FormData();
-      formData.append('policy_id', newPolicyId);
-      formData.append('file', file);
+      const result = await uploadPolicy(file);
+      const newPolicyId = result.policy_id;
 
-      const res = await fetch('http://localhost:8000/ai/upload-and-ingest', {
-        method: 'POST',
-        body: formData
-      });
+      setPolicyId(newPolicyId);
+      localStorage.setItem('policywise_policy_id', newPolicyId);
 
-      if (res.ok) {
-        const data = await res.json();
-        setDocuments(prev => [
-          {
-            id: `doc-${Date.now()}`,
-            title: file.name.replace(/\.[^/.]+$/, ""),
-            details: `${newPolicyId} · Uploaded Just Now`,
-            status: 'Fully Extracted',
-            statusColor: 'text-blue-400',
-            pages: `${data.total_pages || 1} Pages`,
-            size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-            isActive: true,
-          },
-          ...prev.map(d => ({ ...d, isActive: false }))
-        ]);
-      } else {
-        throw new Error('Upload endpoint returned non-200');
-      }
-    } catch (err) {
-      console.warn('Backend upload failed, updating local state:', err);
+      const newDocument = {
+        id: newPolicyId,
+        title: file.name.replace(/\.[^/.]+$/, ''),
+        details: `${newPolicyId.slice(0, 8)} · Uploaded Just Now`,
+        status: 'Processing',
+        statusColor: 'text-amber-400',
+        pages: 'Processing...',
+        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+        isActive: true,
+      };
+
       setDocuments(prev => [
-        {
-          id: `doc-${Date.now()}`,
-          title: file.name.replace(/\.[^/.]+$/, ""),
-          details: `${newPolicyId} · Uploaded Just Now`,
-          status: 'Fully Extracted',
-          statusColor: 'text-blue-400',
-          pages: `${Math.floor(Math.random() * 15) + 5} Pages`,
-          size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-          isActive: true,
-        },
-        ...prev.map(d => ({ ...d, isActive: false }))
+        newDocument,
+        ...prev.map(doc => ({
+          ...doc,
+          isActive: false,
+        })),
       ]);
+
+      let status = 'processing';
+
+      for (let i = 0; i < 30 && status === 'processing'; i++) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const statusResult = await getPolicyStatus(newPolicyId);
+        status = statusResult.status;
+      }
+
+      if (status !== 'completed') {
+        throw new Error('Policy processing failed or timed out.');
+      }
+
+      setDocuments(prev =>
+        prev.map(doc =>
+          doc.id === newPolicyId
+            ? {
+                ...doc,
+                status: 'Fully Extracted',
+                statusColor: 'text-green-400',
+              }
+            : doc
+        )
+      );
+
+      const overview = await getPolicyOverview(newPolicyId);
+      console.log('Policy overview:', overview);
+
+      setMessages([
+        {
+          role: 'ai',
+          text: 'Your policy has been successfully analyzed. Ask me anything about your coverage, exclusions, waiting periods, deductibles, or limits.',
+        },
+      ]);
+
+      setActiveTab('chat');
+    } catch (error) {
+      console.error(error);
+
+      alert(
+        error instanceof Error
+          ? error.message
+          : 'Failed to upload policy.'
+      );
     } finally {
       setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+  
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
-
-
   const setActiveDocument = (id: string) => {
     setDocuments(prev => prev.map(doc => ({
       ...doc,
@@ -323,9 +356,20 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
-    return () => unsub();
-  }, []);
+    const token = localStorage.getItem('policywise_token');
+
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    getCurrentUser()
+      .then(setUser)
+      .catch(() => {
+        localStorage.removeItem('policywise_token');
+        navigate('/login');
+      });
+  }, [navigate]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -341,87 +385,99 @@ export default function Dashboard() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleSignOut = async () => {
-    await signOut(auth);
+  const handleSignOut = () => {
+    logoutUser();
     navigate('/');
   };
 
   const getInitial = () => {
-    if (user?.displayName) return user.displayName.charAt(0).toUpperCase();
-    if (user?.email) return user.email.charAt(0).toUpperCase();
+    if (user?.full_name) {
+      return user.full_name.charAt(0).toUpperCase();
+    }
+
+    if (user?.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+
     return '?';
   };
 
-  const getDisplayName = () => user?.displayName || user?.email?.split('@')[0] || 'User';
-
-  const handleSendMessage = async (e: React.FormEvent) => {
+  const getDisplayName = () =>
+    user?.full_name ||
+    user?.email?.split('@')[0] ||
+    'User';  const handleSendMessage = async (
+    e: React.FormEvent
+  ) => {
     e.preventDefault();
-    if (!message.trim()) return;
 
-    const userQuery = message.trim();
-    setMessage('');
+    const question = message.trim();
 
-    // Append user message & temporary loading indicator
+    if (!question) return;
+
+    const currentPolicyId = policyId || localStorage.getItem('policywise_policy_id');
+
+    if (!currentPolicyId) {
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'ai',
+          text: 'Please upload a policy first so I can answer questions about it.',
+        },
+      ]);
+
+      setMessage('');
+      return;
+    }
+
     setMessages(prev => [
       ...prev,
-      { role: 'user', text: userQuery },
-      { role: 'ai', text: '', isLoading: true }
+      {
+        role: 'user',
+        text: question,
+      },
     ]);
 
-    const targetPolicyId = activeDocument.details.split(' · ')[0] || 'HP-458732';
+    setMessage('');
 
     try {
-      const response = await fetch('http://localhost:8000/ai/ask', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          policy_id: targetPolicyId,
-          question: userQuery
-        })
-      });
+      const result = await askPolicy(
+        currentPolicyId,
+        question
+      );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+      const answer =
+        result.answer ||
+        'I could not find an answer in your policy.';
 
-      const data = await response.json();
+      const confidence =
+        typeof result.confidence === 'number'
+          ? `\n\nAI confidence: ${Math.round(
+              result.confidence * 100
+            )}%`
+          : '';
 
-      setMessages(prev => {
-        const updated = [...prev];
-        const lastIdx = updated.length - 1;
-        updated[lastIdx] = {
+      setMessages(prev => [
+        ...prev,
+        {
           role: 'ai',
-          text: data.answer,
-          confidence: data.confidence !== undefined ? Math.round(data.confidence * 100) : undefined,
-          citations: data.citations || [],
-          missing_information: data.missing_information || [],
-          isLoading: false
-        };
-        return updated;
-      });
-    } catch (err) {
-      console.warn('Backend API server call failed, using local RAG fallback:', err);
-      setTimeout(() => {
-        setMessages(prev => {
-          const updated = [...prev];
-          const lastIdx = updated.length - 1;
-          updated[lastIdx] = {
-            role: 'ai',
-            text: `According to policy schedule (${targetPolicyId}), coverage for '${userQuery}' is subject to standard hospitalization terms (Section 1.1) and waiting periods (Section 3.1). Non-medical consumables are strictly excluded.`,
-            confidence: 82,
-            citations: [
-              { text: "Hospitalization & Inpatient Care covered per Section 1.1; 36-month waiting period for pre-existing conditions.", page: 1, section: "SECTION 1 & 3" }
-            ],
-            missing_information: [],
-            isLoading: false
-          };
-          return updated;
-        });
-      }, 600);
+          text: answer + confidence,
+        },
+      ]);
+    } catch (error) {
+      console.error(error);
+
+      setMessages(prev => [
+        ...prev,
+        {
+          role: 'ai',
+          text:
+            error instanceof Error
+              ? `I couldn't process that question: ${error.message}`
+              : 'I could not process your question.',
+        },
+      ]);
     }
   };
-
-
   const runEstimate = () => {
     setIsAnalyzing(true);
     setHasCalculated(true);
@@ -688,50 +744,11 @@ export default function Dashboard() {
                           <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center font-bold text-xs shadow-lg ${msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-white/10 border border-white/10 text-blue-400'}`}>
                             {msg.role === 'user' ? getInitial() : <Shield className="w-4 h-4" />}
                           </div>
-                          <div className={`p-4 rounded-2xl text-sm leading-relaxed shadow-sm space-y-2.5 ${msg.role === 'user' ? 'bg-blue-500 text-white rounded-tr-sm' : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-sm'}`}>
-                            {msg.isLoading ? (
-                              <div className="flex items-center gap-2 text-blue-400 text-xs py-1">
-                                <span className="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span>
-                                Analyzing policy clauses & searching vector database...
-                              </div>
-                            ) : (
-                              <>
-                                <p className="whitespace-pre-line">{msg.text}</p>
-                                
-                                {msg.role === 'ai' && msg.confidence !== undefined && (
-                                  <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-                                    <span className="flex items-center gap-1.5 font-medium text-blue-300">
-                                      <Zap className="w-3.5 h-3.5 text-blue-400" /> Grounded Confidence:
-                                    </span>
-                                    <span className={`px-2 py-0.5 rounded-md font-bold text-[11px] ${msg.confidence >= 80 ? 'bg-green-500/20 text-green-300 border border-green-500/30' : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'}`}>
-                                      {msg.confidence}%
-                                    </span>
-                                  </div>
-                                )}
-
-                                {msg.citations && msg.citations.length > 0 && (
-                                  <div className="space-y-1.5 pt-1">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
-                                      <FileSearch className="w-3 h-3 text-blue-400" /> Policy Evidence Citations:
-                                    </p>
-                                    <div className="flex flex-col gap-1">
-                                      {msg.citations.map((c, idx) => (
-                                        <div key={idx} className="text-[11px] bg-blue-500/10 border border-blue-400/20 rounded-lg p-2 text-blue-200">
-                                          <div className="font-semibold text-blue-400">
-                                            Page {c.page} {c.section ? `· ${c.section}` : ''}
-                                          </div>
-                                          <div className="text-[10.5px] opacity-80 mt-0.5 italic">"{c.text}"</div>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </>
-                            )}
+                          <div className={`p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm ${msg.role === 'user' ? 'bg-blue-500 text-white rounded-tr-sm' : 'bg-white/5 border border-white/10 text-slate-200 rounded-tl-sm'}`}>
+                            {msg.text}
                           </div>
                         </div>
                       ))}
-
                       <div ref={chatEndRef} />
                     </div>
 
@@ -777,7 +794,7 @@ export default function Dashboard() {
                   <div className="flex items-center gap-3 px-4 py-3 rounded-xl border" style={{ background: 'rgba(37,99,235,0.06)', borderColor: 'rgba(96,165,250,0.2)' }}>
                     <Brain className="w-4 h-4 text-blue-400 shrink-0" />
                     <p className="text-xs text-blue-300/80">
-                      AI cross-references your policy clauses in real-time to give you a personalised cost breakdown — not a generic estimate.
+                      AI cross-references your policy clauses in real-time to give you a personalised cost breakdown â€” not a generic estimate.
                     </p>
                   </div>
 
@@ -1182,3 +1199,16 @@ export default function Dashboard() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
