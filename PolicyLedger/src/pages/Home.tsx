@@ -4,10 +4,11 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, Play, Shield, Activity, Clock, AlertTriangle, IndianRupee, FileWarning, Search, Zap, CheckCircle, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useRef } from 'react';
+import Logo from '../components/Logo';
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
-  
+
   // Track scroll progress within the container
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -22,42 +23,42 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-ink font-sans text-text relative overflow-hidden" ref={containerRef}>
-      
+
       {/* Background ambient light */}
       <div className="fixed top-[-20%] right-[-10%] w-[800px] h-[800px] bg-neon-blue/20 blur-[150px] rounded-full pointer-events-none z-0"></div>
       <div className="fixed bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-neon-blue/10 blur-[120px] rounded-full pointer-events-none z-0"></div>
-      
+
       <div className="fixed bottom-0 left-0 w-full h-[40vh] bg-[radial-gradient(ellipse_at_center,rgba(56,189,248,0.1)_0%,transparent_70%)] pointer-events-none z-0"></div>
 
       <Nav />
-      
+
       {/* Scrollable Container with Sticky Right Side */}
       <main className="relative z-10 max-w-[1400px] mx-auto px-6 pt-32 lg:pt-40">
-        
+
         <div className="flex flex-col lg:flex-row gap-12 lg:gap-20 w-full relative">
-          
+
           {/* Left Content (Scrolls naturally) */}
           <div className="w-full lg:w-1/2 pb-12">
-            
+
             {/* HERO SECTION (Text) */}
             <div className="space-y-8 min-h-[80vh] flex flex-col justify-center">
 
-              
+
               <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-bold leading-[1.1] tracking-tight">
                 Your Insurance. <br />
                 <span className="text-neon-blue">Finally Understood.</span>
               </h1>
-              
-              <motion.p 
+
+              <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
                 className="text-lg text-muted max-w-lg leading-relaxed font-light"
               >
-                PolicyLedger uses AI to decode your insurance policy, explain your coverage and estimate your treatment costs — so you're never left guessing.
+                InsureSight uses AI to decode your insurance policy, explain your coverage and estimate your treatment costs — so you're never left guessing.
               </motion.p>
-              
-              <motion.div 
+
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6, duration: 0.5 }}
@@ -66,7 +67,7 @@ export default function Home() {
                 <Link to="/login" className="neon-button">
                   Get Started <ArrowRight className="w-4 h-4" />
                 </Link>
-                
+
                 <button className="flex items-center gap-3 text-text hover:text-neon-blue transition-colors font-medium">
                   Learn More <Play className="w-5 h-5" fill="currentColor" />
                 </button>
@@ -75,14 +76,14 @@ export default function Home() {
 
             {/* HOW IT WORKS SECTION */}
             <div className="py-12 space-y-24">
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 className="space-y-4"
               >
                 <BlurText text="How it works" className="text-4xl font-bold" />
-                <motion.p 
+                <motion.p
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3, duration: 0.5 }}
@@ -94,7 +95,7 @@ export default function Home() {
               </motion.div>
 
               <div className="space-y-16">
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, x: -30 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
@@ -110,7 +111,7 @@ export default function Home() {
                   </div>
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, x: -30 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
@@ -126,7 +127,7 @@ export default function Home() {
                   </div>
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, x: -30 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-100px" }}
@@ -149,7 +150,7 @@ export default function Home() {
           {/* Right Content: Sticky 3D Floating Policy Card */}
           <div className="hidden lg:block w-1/2 relative h-auto">
             <div className="sticky top-0 h-screen w-full flex items-center justify-center perspective-1000">
-              
+
               {/* Glowing pedestal base */}
               <div className="absolute bottom-[15%] w-[400px] h-[100px] rounded-[100%] border-[2px] border-neon-blue/30 shadow-[0_0_50px_rgba(56,189,248,0.2)] bg-neon-blue/5 transform rotate-x-[60deg]">
                 <div className="absolute inset-4 rounded-[100%] border border-neon-blue/50"></div>
@@ -157,10 +158,10 @@ export default function Home() {
               </div>
 
               {/* The Floating Card (Animated by scroll) */}
-              <motion.div 
-                style={{ 
-                  rotateY, 
-                  rotateX, 
+              <motion.div
+                style={{
+                  rotateY,
+                  rotateX,
                   scale,
                   y: yOffset
                 }}
@@ -173,10 +174,10 @@ export default function Home() {
                       <Shield className="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold tracking-tight text-slate-900">INSURANCE <br/>POLICY</h2>
+                      <h2 className="text-xl font-bold tracking-tight text-slate-900">INSURANCE <br />POLICY</h2>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2 mb-8">
                     <div className="flex justify-between text-xs">
                       <span className="text-slate-500">Policy No.</span>
@@ -188,7 +189,7 @@ export default function Home() {
                     </div>
                     <div className="w-full h-px bg-slate-200 mt-2"></div>
                   </div>
-                  
+
                   <div className="space-y-4">
                     {[
                       { icon: Activity, label: "Coverage" },
@@ -208,7 +209,7 @@ export default function Home() {
                       </div>
                     ))}
                   </div>
-                  
+
                   <div className="mt-8 flex justify-end">
                     <div className="font-serif italic text-2xl text-slate-400 opacity-70">
                       Josephine
@@ -226,17 +227,17 @@ export default function Home() {
                 </div>
 
               </motion.div>
-              
+
             </div>
           </div>
-          
+
         </div>
 
         {/* FULL WIDTH SECTIONS BELOW SCROLL BLOCK */}
         <div className="max-w-6xl mx-auto pb-32">
           {/* BENTO BOX CAPABILITIES SECTION */}
           <div className="py-24 space-y-12">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -247,9 +248,9 @@ export default function Home() {
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              
+
               {/* Bento Card 1 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -263,7 +264,7 @@ export default function Home() {
               </motion.div>
 
               {/* Bento Card 2 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -277,7 +278,7 @@ export default function Home() {
               </motion.div>
 
               {/* Bento Card 3 */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -291,7 +292,7 @@ export default function Home() {
               </motion.div>
 
               {/* Bento Card 4 (Full Width) */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -318,7 +319,7 @@ export default function Home() {
           <div className="py-24 max-w-4xl mx-auto text-center">
             <div className="rounded-3xl p-16 border border-neon-blue/30 bg-gradient-to-br from-neon-blue/20 to-transparent shadow-[0_0_50px_rgba(56,189,248,0.15)] relative overflow-hidden">
               <div className="absolute -top-32 -right-32 w-[400px] h-[400px] bg-neon-blue/30 blur-[80px] rounded-full pointer-events-none"></div>
-              
+
               <h2 className="text-4xl lg:text-5xl font-bold mb-8 relative z-10 text-white tracking-tight">Ready to decode your policy?</h2>
               <Link to="/login" className="inline-flex neon-button relative z-10 text-lg px-8 py-4">
                 Start for free <ArrowRight className="w-5 h-5 ml-2" />
@@ -327,12 +328,12 @@ export default function Home() {
           </div>
         </div>
       </main>
-      
+
       {/* Scroll indicator */}
       <div className="fixed bottom-8 left-8 flex items-center gap-4 text-sm text-muted z-50">
         <div className="w-6 h-10 rounded-full border border-white/20 flex justify-center pt-2">
-          <motion.div 
-            animate={{ y: [0, 10, 0] }} 
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
             transition={{ duration: 1.5, repeat: Infinity }}
             className="w-1 h-1 rounded-full bg-neon-blue/80 shadow-[0_0_8px_#38BDF8]"
           ></motion.div>
@@ -340,7 +341,7 @@ export default function Home() {
         Scroll to explore
         <div className="w-24 h-px bg-white/10 ml-2"></div>
       </div>
-      
+
     </div>
   );
 }

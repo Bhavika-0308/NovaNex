@@ -1,15 +1,63 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Shield, ArrowRight, Lock } from 'lucide-react';
+import { ArrowRight, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { auth } from '../firebase';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import Logo from '../components/Logo';
 
 export default function Login() {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [signupMessage, setSignupMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/dashboard');
+    setErrorMessage('');
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        if (name) {
+          await updateProfile(userCredential.user, { displayName: name });
+        }
+      }
+      navigate('/');
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code ?? '';
+      if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+        setErrorMessage('Invalid email or password. Please try again.');
+      } else if (code === 'auth/email-already-in-use') {
+        setErrorMessage('An account with this email already exists. Please log in instead.');
+      } else if (code === 'auth/weak-password') {
+        setErrorMessage('Password must be at least 6 characters long.');
+      } else if (code === 'auth/invalid-email') {
+        setErrorMessage('Please enter a valid email address.');
+      } else if (code === 'auth/operation-not-allowed') {
+        setErrorMessage('Email/password sign-in is not enabled. Please contact support.');
+      } else if (code === 'auth/too-many-requests') {
+        setErrorMessage('Too many failed attempts. Please wait a moment and try again.');
+      } else if (code === 'auth/network-request-failed') {
+        setErrorMessage('Network error. Please check your internet connection and try again.');
+      } else {
+        setErrorMessage(
+          import.meta.env.DEV
+            ? `Something went wrong. (Firebase code: ${code || 'unknown'})`
+            : 'Something went wrong. Please try again.'
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -23,11 +71,9 @@ export default function Login() {
       <div className="hidden lg:flex w-[45%] border-r border-white/10 p-12 flex-col justify-between relative overflow-hidden bg-white/5 backdrop-blur-3xl z-10">
         <div className="relative z-10">
           <Link to="/" className="flex items-center gap-2 group w-max">
-            <div className="w-8 h-8 rounded bg-neon-blue flex items-center justify-center text-ink shadow-[0_0_15px_rgba(56,189,248,0.5)] group-hover:scale-105 transition-transform">
-              <Shield className="w-5 h-5" />
-            </div>
-            <span className="font-bold text-xl text-text tracking-tight group-hover:text-neon-blue transition-colors">
-              PolicyLedger
+            <Logo size={32} className="group-hover:opacity-90 transition-opacity" />
+            <span className="font-bold text-xl text-text tracking-tight group-hover:text-accent transition-colors">
+              InsureSight
             </span>
           </Link>
         </div>
@@ -61,10 +107,8 @@ export default function Login() {
         {/* Mobile Wordmark */}
         <div className="absolute top-6 left-6 lg:hidden">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-neon-blue flex items-center justify-center text-ink shadow-[0_0_10px_rgba(56,189,248,0.5)]">
-              <Shield className="w-3 h-3" />
-            </div>
-            <span className="font-bold text-lg tracking-tight">PolicyLedger</span>
+            <Logo size={24} />
+            <span className="font-bold text-lg tracking-tight">InsureSight</span>
           </Link>
         </div>
 
@@ -82,9 +126,31 @@ export default function Login() {
             <p className="text-muted text-sm font-light">
               {isLogin 
                 ? 'Enter your details to access your intelligence dashboard.'
-                : 'Get started with PolicyLedger to decode your coverage.'}
+                : 'Get started with InsureSight to decode your coverage.'}
             </p>
           </div>
+
+          {signupMessage && isLogin && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center gap-3 text-emerald-400"
+            >
+              <CheckCircle className="w-5 h-5 flex-shrink-0" />
+              <p className="text-sm">{signupMessage}</p>
+            </motion.div>
+          )}
+
+          {errorMessage && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-3 text-red-400"
+            >
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <p className="text-sm">{errorMessage}</p>
+            </motion.div>
+          )}
 
           <form className="space-y-5" onSubmit={handleSubmit}>
             {!isLogin && (
@@ -97,6 +163,8 @@ export default function Login() {
                 <input 
                   type="text" 
                   id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md"
                   placeholder="John Doe"
                 />
@@ -108,6 +176,8 @@ export default function Login() {
               <input 
                 type="email" 
                 id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md"
                 placeholder="you@example.com"
               />
@@ -115,16 +185,31 @@ export default function Login() {
             
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-text/80 block" htmlFor="password">Password</label>
-              <input 
-                type="password" 
-                id="password"
-                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <input 
+                  type={showPassword ? "text" : "password"} 
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md pr-12"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted hover:text-text transition-colors flex items-center justify-center"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
-            <button type="submit" className="w-full neon-button justify-center mt-2">
-              {isLogin ? 'Sign in' : 'Create account'}
+            <button type="submit" disabled={loading} className="w-full neon-button justify-center mt-2 disabled:opacity-60 disabled:cursor-not-allowed">
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                isLogin ? 'Sign in' : 'Create account'
+              )}
             </button>
           </form>
 
@@ -132,10 +217,10 @@ export default function Login() {
             {isLogin ? (
               <>
                 <button type="button" className="text-muted hover:text-neon-blue transition-colors">Forgot password?</button>
-                <button type="button" onClick={() => setIsLogin(false)} className="text-muted hover:text-neon-blue transition-colors">Create account</button>
+                <button type="button" onClick={() => { setIsLogin(false); setSignupMessage(''); }} className="text-muted hover:text-neon-blue transition-colors">Create account</button>
               </>
             ) : (
-              <button type="button" onClick={() => setIsLogin(true)} className="text-muted hover:text-neon-blue transition-colors mx-auto">
+              <button type="button" onClick={() => { setIsLogin(true); setSignupMessage(''); }} className="text-muted hover:text-neon-blue transition-colors mx-auto">
                 Already have an account? Sign in
               </button>
             )}

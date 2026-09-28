@@ -1,5 +1,5 @@
 {
-  "name": "policyledger",
+  "name": "insuresight",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
+    "firebase": "^12.19.0",
     "framer-motion": "^13.4.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
