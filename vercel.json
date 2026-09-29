@@ -3,7 +3,6 @@
   "buildCommand": "npm --prefix PolicyLedger run build",
   "outputDirectory": "PolicyLedger/dist",
   "installCommand": "npm --prefix PolicyLedger install",
-  "framework": "vite",
   "rewrites": [
     {
       "source": "/(.*)",
