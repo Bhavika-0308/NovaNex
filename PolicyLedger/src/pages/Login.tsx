@@ -1,38 +1,26 @@
 ﻿import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Lock, Eye, EyeOff, CheckCircle, AlertCircle, Loader2, Shield } from 'lucide-react';
+import { Lock, Eye, EyeOff, AlertCircle, Loader2, Shield } from 'lucide-react';
 import { useState } from 'react';
 import Logo from '../components/Logo';
-import { loginUser, signupUser } from '../api';
+import { loginUser } from '../api';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
-  const [signupMessage, setSignupMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
-    setSignupMessage('');
     setLoading(true);
 
     try {
-      if (isLogin) {
-        await loginUser(email, password);
-        navigate('/dashboard');
-      } else {
-        await signupUser(email, password, name);
-
-        setSignupMessage('Account created successfully. Please sign in.');
-        setIsLogin(true);
-        setPassword('');
-      }
+      await loginUser(email, password);
+      navigate('/dashboard');
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : 'Something went wrong.';
@@ -95,7 +83,6 @@ export default function Login() {
         </div>
 
         <motion.div 
-          key={isLogin ? 'login' : 'signup'}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
@@ -103,25 +90,12 @@ export default function Login() {
         >
           <div className="space-y-2 mb-8 text-center lg:text-left">
             <h1 className="text-3xl font-bold tracking-tight">
-              {isLogin ? 'Welcome back' : 'Create an account'}
+              Continue to InsureSight
             </h1>
             <p className="text-muted text-sm font-light">
-              {isLogin 
-                ? 'Enter your details to access your intelligence dashboard.'
-                : 'Get started with InsureSight to decode your coverage.'}
+              Enter anything to open the shared demo workspace.
             </p>
           </div>
-
-          {signupMessage && isLogin && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center gap-3 text-emerald-400"
-            >
-              <CheckCircle className="w-5 h-5 flex-shrink-0" />
-              <p className="text-sm">{signupMessage}</p>
-            </motion.div>
-          )}
 
           {errorMessage && (
             <motion.div 
@@ -135,33 +109,16 @@ export default function Login() {
           )}
 
           <form className="space-y-5" onSubmit={handleSubmit}>
-            {!isLogin && (
-              <motion.div 
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                className="space-y-1.5 overflow-hidden"
-              >
-                <label className="text-sm font-medium text-text/80 block" htmlFor="name">Full name</label>
-                <input 
-                  type="text" 
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md"
-                  placeholder="John Doe"
-                />
-              </motion.div>
-            )}
-
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-text/80 block" htmlFor="email">Email address</label>
+              <label className="text-sm font-medium text-text/80 block" htmlFor="email">Username</label>
               <input 
-                type="email" 
+                type="text" 
                 id="email"
+                autoComplete="username"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md"
-                placeholder="you@example.com"
+                placeholder="Anything works"
               />
             </div>
             
@@ -171,10 +128,11 @@ export default function Login() {
                 <input 
                   type={showPassword ? "text" : "password"} 
                   id="password"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md pr-12"
-                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                  placeholder="Anything works"
                 />
                 <button
                   type="button"
@@ -190,36 +148,10 @@ export default function Login() {
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                isLogin ? 'Sign in' : 'Create account'
+                'Continue'
               )}
             </button>
           </form>
-
-          <div className="flex justify-between items-center text-sm mt-6">
-            {isLogin ? (
-              <>
-                <button type="button" className="text-muted hover:text-neon-blue transition-colors">Forgot password?</button>
-                <button type="button" onClick={() => { setIsLogin(false); setSignupMessage(''); }} className="text-muted hover:text-neon-blue transition-colors">Create account</button>
-              </>
-            ) : (
-              <button type="button" onClick={() => { setIsLogin(true); setSignupMessage(''); }} className="text-muted hover:text-neon-blue transition-colors mx-auto">
-                Already have an account? Sign in
-              </button>
-            )}
-          </div>
-
-          <div className="relative py-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/10"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-ink text-muted font-medium text-xs uppercase tracking-wider">Or</span>
-            </div>
-          </div>
-
-          <Link to="/dashboard" className="w-full flex items-center justify-center gap-2 bg-white/5 border border-white/10 text-text font-medium px-4 py-3 rounded-lg hover:bg-white/10 hover:border-white/20 transition-colors group">
-            Continue with sample policy <ArrowRight className="w-4 h-4 text-white/50 group-hover:text-neon-blue transition-colors" />
-          </Link>
         </motion.div>
       </div>
 

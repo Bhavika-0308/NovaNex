@@ -6,8 +6,8 @@ class SignupRequest(BaseModel):
     full_name: str | None = Field(default=None, max_length=200)
 
 class LoginRequest(BaseModel):
-    email: EmailStr
-    password: str
+    email: str = ""
+    password: str = ""
 
 class TokenResponse(BaseModel):
     access_token: str

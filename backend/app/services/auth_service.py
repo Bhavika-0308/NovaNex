@@ -1,4 +1,5 @@
 from uuid import uuid4
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.user import User
@@ -6,6 +7,7 @@ from app.repositories.user_repository import UserRepository
 from app.core.security import hash_password, verify_password, create_access_token
 
 repo = UserRepository()
+GUEST_EMAIL = "guest@insuresight.local"
 
 def signup(db: Session, email: str, password: str, full_name: str | None):
     email = email.lower().strip()
@@ -15,8 +17,23 @@ def signup(db: Session, email: str, password: str, full_name: str | None):
     db.add(user); db.commit(); db.refresh(user)
     return user
 
-def login(db: Session, email: str, password: str):
-    user = repo.get_by_email(db, email.lower().strip())
-    if not user or not verify_password(password, user.password_hash):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail={"error": {"code": "INVALID_CREDENTIALS", "message": "Invalid email or password"}})
+def login(db: Session, _email: str = "", _password: str = ""):
+    user = repo.get_by_email(db, GUEST_EMAIL)
+    if not user:
+        user = User(
+            id=str(uuid4()),
+            email=GUEST_EMAIL,
+            password_hash=hash_password(uuid4().hex),
+            full_name="Guest User",
+        )
+        db.add(user)
+        try:
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+            user = repo.get_by_email(db, GUEST_EMAIL)
+            if not user:
+                raise
+        else:
+            db.refresh(user)
     return create_access_token(user.id)

@@ -1,21 +1,37 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect, useRef } from 'react';
-import { auth } from '../firebase';
-import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LogOut, LayoutDashboard, User as UserIcon, Mail, Shield } from 'lucide-react';
 import Logo from './Logo';
+import { getCurrentUser, logoutUser } from '../api';
+
+interface SessionUser {
+  email: string;
+  full_name: string | null;
+}
 
 export default function Nav() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<SessionUser | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Listen to Firebase auth state
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => setUser(u));
-    return () => unsub();
+    if (!localStorage.getItem('policywise_token')) return;
+
+    let mounted = true;
+    getCurrentUser()
+      .then((currentUser) => {
+        if (mounted) setUser(currentUser);
+      })
+      .catch(() => {
+        logoutUser();
+        if (mounted) setUser(null);
+      });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   // Close dropdown when clicking outside
@@ -29,20 +45,20 @@ export default function Nav() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     setDropdownOpen(false);
-    await signOut(auth);
+    logoutUser();
+    setUser(null);
     navigate('/');
   };
 
-  // Get the display initial (name first, then email)
   const getInitial = () => {
-    if (user?.displayName) return user.displayName.charAt(0).toUpperCase();
+    if (user?.full_name) return user.full_name.charAt(0).toUpperCase();
     if (user?.email) return user.email.charAt(0).toUpperCase();
     return '?';
   };
 
-  const getDisplayName = () => user?.displayName || user?.email?.split('@')[0] || 'User';
+  const getDisplayName = () => user?.full_name || user?.email?.split('@')[0] || 'User';
 
   return (
     <div className="fixed top-6 left-0 w-full z-50 flex justify-center pointer-events-none">

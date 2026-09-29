@@ -19,8 +19,6 @@ def client():
     return TestClient(app)
 
 def signup_and_login(client, email="user@example.com"):
-    r = client.post("/api/auth/signup", json={"email": email, "password": "password123", "full_name": "Test User"})
-    assert r.status_code == 201
-    r = client.post("/api/auth/login", json={"email": email, "password": "password123"})
+    r = client.post("/api/auth/login", json={"email": email, "password": "anything"})
     assert r.status_code == 200
     return {"Authorization": f"Bearer {r.json()['access_token']}"}

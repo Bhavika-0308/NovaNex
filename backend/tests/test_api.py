@@ -10,7 +10,16 @@ def test_signup_login_me(client):
     headers = signup_and_login(client)
     r = client.get("/api/auth/me", headers=headers)
     assert r.status_code == 200
-    assert r.json()["email"] == "user@example.com"
+    assert r.json()["email"] == "guest@insuresight.local"
+
+def test_login_accepts_any_credentials(client):
+    first = client.post("/api/auth/login", json={"email": "not an email", "password": ""})
+    second = client.post("/api/auth/login", json={})
+    assert first.status_code == 200
+    assert second.status_code == 200
+    first_user = client.get("/api/auth/me", headers={"Authorization": f"Bearer {first.json()['access_token']}"})
+    second_user = client.get("/api/auth/me", headers={"Authorization": f"Bearer {second.json()['access_token']}"})
+    assert first_user.json()["id"] == second_user.json()["id"]
 
 def test_invalid_pdf(client):
     headers = signup_and_login(client)
@@ -18,7 +27,7 @@ def test_invalid_pdf(client):
     assert r.status_code == 400
     assert r.json()["error"]["code"] == "INVALID_PDF"
 
-def test_policy_upload_and_ownership(client):
+def test_policy_upload_is_shared_with_guest_sessions(client):
     headers = signup_and_login(client, "a@example.com")
     pdf = b"%PDF-1.4\n%test"
     # Minimal header is not a readable PDF, so generate via fitz in test instead.
@@ -30,7 +39,7 @@ def test_policy_upload_and_ownership(client):
     pid = r.json()["policy_id"]
     assert client.get(f"/api/policies/{pid}", headers=headers).status_code == 200
     other = signup_and_login(client, "b@example.com")
-    assert client.get(f"/api/policies/{pid}", headers=other).status_code == 404
+    assert client.get(f"/api/policies/{pid}", headers=other).status_code == 200
 
 def test_cost_no_dataset(client):
     headers = signup_and_login(client)
@@ -42,7 +51,7 @@ def test_coverage_missing_information(client):
     pid = str(uuid.uuid4())
     db = SessionLocal()
     from app.models.user import User
-    user = db.query(User).filter(User.email == "user@example.com").first()
+    user = db.query(User).filter(User.email == "guest@insuresight.local").first()
     policy = Policy(id=pid, user_id=user.id, filename="p.pdf", file_path="/tmp/p.pdf", status="completed", overview_json=json.dumps({"coverage_summary":"test"}), rules_json=json.dumps({"treatments":{"Knee Replacement":{"covered":True,"coverage_percentage":80,"required_information":["network_status"]}}}))
     db.add(policy); db.commit(); db.close()
     r = client.post("/api/coverage/analyze", headers=headers, json={"policy_id":pid,"treatment":"Knee Replacement","treatment_cost":250000,"patient_details":{"age":45,"location":"Pune"}})
@@ -54,7 +63,7 @@ def test_recalculate_and_report(client):
     headers = signup_and_login(client)
     pid = str(uuid.uuid4())
     db = SessionLocal(); from app.models.user import User
-    user = db.query(User).filter(User.email == "user@example.com").first()
+    user = db.query(User).filter(User.email == "guest@insuresight.local").first()
     policy = Policy(id=pid, user_id=user.id, filename="p.pdf", file_path="/tmp/p.pdf", status="completed", overview_json=json.dumps({"coverage_summary":"Knee cover"}), rules_json=json.dumps({"treatments":{"Knee Replacement":{"covered":True,"coverage_percentage":80,"required_information":["network_status"],"copay_percentage":10}}}))
     db.add(policy); db.commit(); db.close()
     r = client.post("/api/coverage/analyze", headers=headers, json={"policy_id":pid,"treatment":"Knee Replacement","treatment_cost":250000,"patient_details":{"age":45,"location":"Pune"}})

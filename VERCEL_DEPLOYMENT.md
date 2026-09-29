@@ -18,6 +18,10 @@ Deploy the frontend and FastAPI backend as two Vercel projects linked to this sa
 
 Set backend `AI_API_KEY`, `AI_MODEL`, and `AI_ASSISTANT_MODULE` only if the configured assistant integration requires them.
 
+## Demo access warning
+
+The login form currently grants every visitor the same guest account regardless of the entered values. All visitors can access and modify the same uploaded policies and analyses. Do not use this mode with personal, medical, or otherwise private documents. Restore real authentication and per-user accounts before production use.
+
 The current policy upload implementation writes to local disk. Vercel function filesystems are ephemeral, so uploaded policy files will not be durable; configure external object storage before relying on uploads in production. Functions also have request duration and upload-size limits, so long-running document processing may need a separate worker service. For preview deployments, set `FRONTEND_URL` to the matching frontend preview origin or use a stable frontend domain.
 
 ## Local checks
