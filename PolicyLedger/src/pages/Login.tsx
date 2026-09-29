@@ -1,4 +1,4 @@
-﻿import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, Eye, EyeOff, AlertCircle, Loader2, Shield } from 'lucide-react';
 import { useState } from 'react';
@@ -93,7 +93,7 @@ export default function Login() {
               Continue to InsureSight
             </h1>
             <p className="text-muted text-sm font-light">
-              Enter anything to open the shared demo workspace.
+              Sign in with Firebase Authentication or click Continue for demo access.
             </p>
           </div>
 
@@ -110,7 +110,7 @@ export default function Login() {
 
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-text/80 block" htmlFor="email">Username</label>
+              <label className="text-sm font-medium text-text/80 block" htmlFor="email">Email / Username</label>
               <input 
                 type="text" 
                 id="email"
@@ -118,7 +118,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md"
-                placeholder="Anything works"
+                placeholder="email@example.com (or leave blank for demo)"
               />
             </div>
             
@@ -132,7 +132,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md pr-12"
-                  placeholder="Anything works"
+                  placeholder="Password (optional for demo)"
                 />
                 <button
                   type="button"
@@ -148,7 +148,7 @@ export default function Login() {
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                'Continue'
+                'Continue with Firebase'
               )}
             </button>
           </form>

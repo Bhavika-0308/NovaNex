@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, MessageSquare, Calculator, FileText, Send, Settings, LogOut,
@@ -205,10 +205,10 @@ export default function Dashboard() {
     { role: 'ai', text: 'Hello! I have successfully analyzed your Comprehensive Health policy (HP-458732). What would you like to know about your coverage?' }
   ]);
   type BackendUser = {
-  id: string;
-  email: string;
-  full_name?: string;
-};
+    id: string;
+    email: string;
+    full_name?: string | null;
+  };
 
   const [user, setUser] = useState<BackendUser | null>(null);
   const [profileOpen, setProfileOpen] = useState(false);

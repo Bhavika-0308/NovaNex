@@ -1,4 +1,10 @@
-﻿const configuredApiBase =
+import {
+  loginWithFirebase,
+  logoutWithFirebase,
+  getCurrentFirebaseUser,
+} from "./firebase";
+
+const configuredApiBase =
   import.meta.env.VITE_API_BASE_URL ??
   (import.meta.env.DEV ? "http://localhost:8000" : "");
 const API_BASE = configuredApiBase.replace(/\/+$/, "");
@@ -51,39 +57,44 @@ export async function apiRequest(
   return data;
 }
 
-export async function loginUser(email: string, password: string) {
-  const data = await apiRequest("/api/auth/login", {
-    method: "POST",
-    body: JSON.stringify({ email, password }),
-  });
-
-  if (typeof data.access_token !== "string" || !data.access_token) {
-    throw new Error("The login response did not include an access token.");
-  }
-
-  localStorage.setItem("policywise_token", data.access_token);
-  return data;
+export async function loginUser(email?: string, password?: string) {
+  const userInfo = await loginWithFirebase(email, password);
+  return {
+    access_token: localStorage.getItem("policywise_token") || "firebase_demo_token",
+    token_type: "bearer",
+    user: userInfo,
+  };
 }
 
 export async function signupUser(
   email: string,
   password: string,
-  full_name: string
+  full_name?: string
 ) {
-  return apiRequest("/api/auth/signup", {
-    method: "POST",
-    body: JSON.stringify({ email, password, full_name }),
-  });
+  const userInfo = await loginWithFirebase(email, password);
+  if (full_name) {
+    userInfo.full_name = full_name;
+    localStorage.setItem("policywise_user", JSON.stringify(userInfo));
+  }
+  return {
+    access_token: localStorage.getItem("policywise_token") || "firebase_demo_token",
+    token_type: "bearer",
+    user: userInfo,
+  };
 }
 
 export async function getCurrentUser() {
-  return apiRequest("/api/auth/me");
+  const user = getCurrentFirebaseUser();
+  if (!user) {
+    throw new Error("No active session.");
+  }
+  return user;
 }
 
 export function logoutUser() {
-  localStorage.removeItem("policywise_token");
-  localStorage.removeItem("policywise_policy_id");
+  logoutWithFirebase();
 }
+
 
 export async function uploadPolicy(file: File) {
   const formData = new FormData();
