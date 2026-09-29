@@ -1,4 +1,7 @@
-﻿const API_BASE = "http://localhost:8000";
+﻿const configuredApiBase =
+  import.meta.env.VITE_API_BASE_URL ??
+  (import.meta.env.DEV ? "http://localhost:8000" : "");
+const API_BASE = configuredApiBase.replace(/\/+$/, "");
 
 export async function apiRequest(
   endpoint: string,
@@ -16,12 +19,25 @@ export async function apiRequest(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch {
+    throw new Error(
+      "Could not reach the API. Check VITE_API_BASE_URL and the backend CORS settings."
+    );
+  }
 
   const data = await response.json().catch(() => ({}));
+
+  if (!response.headers.get("content-type")?.includes("json")) {
+    throw new Error(
+      "The API returned an unexpected response. Check that VITE_API_BASE_URL points to the backend."
+    );
+  }
 
   if (!response.ok) {
     const message =
@@ -40,6 +56,10 @@ export async function loginUser(email: string, password: string) {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
+
+  if (typeof data.access_token !== "string" || !data.access_token) {
+    throw new Error("The login response did not include an access token.");
+  }
 
   localStorage.setItem("policywise_token", data.access_token);
   return data;
