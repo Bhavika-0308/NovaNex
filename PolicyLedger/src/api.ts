@@ -1,5 +1,6 @@
 import {
   loginWithFirebase,
+  createAccountWithFirebase,
   logoutWithFirebase,
   getCurrentFirebaseUser,
 } from "./firebase";
@@ -71,11 +72,7 @@ export async function signupUser(
   password: string,
   full_name?: string
 ) {
-  const userInfo = await loginWithFirebase(email, password);
-  if (full_name) {
-    userInfo.full_name = full_name;
-    localStorage.setItem("policywise_user", JSON.stringify(userInfo));
-  }
+  const userInfo = await createAccountWithFirebase(email, password, full_name);
   return {
     access_token: localStorage.getItem("policywise_token") || "firebase_demo_token",
     token_type: "bearer",

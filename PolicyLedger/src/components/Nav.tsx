@@ -163,7 +163,7 @@ export default function Nav() {
                 Log in
               </Link>
               <Link
-                to="/login"
+                to="/signup"
                 className="text-sm bg-text text-ink font-semibold px-4 py-2 rounded-full hover:scale-105 transition-transform"
               >
                 Get Started

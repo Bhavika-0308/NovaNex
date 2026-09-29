@@ -5,6 +5,7 @@ import {
   signInAnonymously,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  updateProfile,
   signOut,
   type Auth,
 } from "firebase/auth";
@@ -141,6 +142,82 @@ export async function loginWithFirebase(email?: string, password?: string): Prom
   localStorage.setItem("policywise_user", JSON.stringify(userInfo));
 
   return userInfo;
+}
+
+export async function createAccountWithFirebase(
+  email: string,
+  password: string,
+  fullName?: string
+): Promise<AuthUserInfo> {
+  const cleanEmail = email.trim();
+  const cleanPassword = password.trim();
+
+  if (!cleanEmail || !cleanPassword) {
+    throw new Error("Please enter both email and password.");
+  }
+  if (!cleanEmail.includes("@") || !cleanEmail.includes(".")) {
+    throw new Error("Please enter a valid email address.");
+  }
+  if (cleanPassword.length < 6) {
+    throw new Error("Password must be at least 6 characters long.");
+  }
+
+  // If Firebase Auth is offline or blocked, fallback gracefully
+  if (!auth) {
+    const demoInfo: AuthUserInfo = {
+      id: `usr-${Date.now()}`,
+      email: cleanEmail,
+      full_name: fullName?.trim() || cleanEmail.split("@")[0],
+      uid: `usr-${Date.now()}`,
+      isAnonymous: false,
+    };
+    localStorage.setItem("policywise_token", "firebase_demo_token");
+    localStorage.setItem("policywise_user", JSON.stringify(demoInfo));
+    return demoInfo;
+  }
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, cleanEmail, cleanPassword);
+    const fbUser = userCredential.user;
+
+    if (fullName && fullName.trim()) {
+      try {
+        await updateProfile(fbUser, { displayName: fullName.trim() });
+      } catch (e) {
+        console.warn("Could not update displayName:", e);
+      }
+    }
+
+    let token = "firebase_demo_token";
+    try {
+      token = await fbUser.getIdToken();
+    } catch {
+      // ignore
+    }
+
+    const userInfo: AuthUserInfo = {
+      id: fbUser.uid,
+      email: fbUser.email || cleanEmail,
+      full_name: fullName?.trim() || fbUser.displayName || cleanEmail.split("@")[0],
+      uid: fbUser.uid,
+      isAnonymous: false,
+    };
+
+    localStorage.setItem("policywise_token", token);
+    localStorage.setItem("policywise_user", JSON.stringify(userInfo));
+
+    return userInfo;
+  } catch (err: any) {
+    if (err.code === "auth/email-already-in-use") {
+      throw new Error("An account with this email already exists. Please sign in instead.");
+    } else if (err.code === "auth/weak-password") {
+      throw new Error("Password is too weak. Please use at least 6 characters.");
+    } else if (err.code === "auth/invalid-email") {
+      throw new Error("Please enter a valid email address.");
+    } else {
+      throw new Error(err.message ? err.message.replace("Firebase: ", "") : "Account creation failed.");
+    }
+  }
 }
 
 export async function logoutWithFirebase(): Promise<void> {
