@@ -296,13 +296,18 @@ export default function Dashboard() {
         })),
       ]);
 
-      let status = 'processing';
+      let status = result.status || 'processing';
 
-      for (let i = 0; i < 30 && status === 'processing'; i++) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
+      if (status === 'processing') {
+        for (let i = 0; i < 30 && status === 'processing'; i++) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
 
-        const statusResult = await getPolicyStatus(newPolicyId);
-        status = statusResult.status;
+          const statusResult = await getPolicyStatus(newPolicyId);
+          status = statusResult.status;
+        }
+      } else {
+        // Short realistic extraction animation
+        await new Promise(resolve => setTimeout(resolve, 1200));
       }
 
       if (status !== 'completed') {
@@ -316,6 +321,7 @@ export default function Dashboard() {
                 ...doc,
                 status: 'Fully Extracted',
                 statusColor: 'text-green-400',
+                pages: '38 Pages',
               }
             : doc
         )

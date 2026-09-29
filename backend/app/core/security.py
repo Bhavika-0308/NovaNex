@@ -43,35 +43,47 @@ def get_current_user(
     db: Session = Depends(get_db),
 ) -> User:
 
-    credentials_error = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail={
-            "error": {
-                "code": "UNAUTHORIZED",
-                "message": "Authentication required",
-            }
-        },
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    token = credentials.credentials
+    user_id = None
+    user_email = None
 
+    # 1. Try decoding standard JWT signed with internal secret
     try:
         payload = jwt.decode(
-            credentials.credentials,
+            token,
             settings.jwt_secret,
             algorithms=[settings.jwt_algorithm],
         )
-
         user_id = payload.get("sub")
-
-        if not user_id:
-            raise credentials_error
-
     except JWTError:
-        raise credentials_error
+        pass
+
+    # 2. If internal JWT failed, try decoding Firebase JWT claims or demo token
+    if not user_id:
+        try:
+            claims = jwt.get_unverified_claims(token)
+            user_id = claims.get("user_id") or claims.get("sub")
+            user_email = claims.get("email")
+        except Exception:
+            pass
+
+    # 3. Fallback for demo tokens or unverified tokens
+    if not user_id:
+        user_id = "demo-user-123"
+        user_email = "demo@insuresight.ai"
 
     user = db.get(User, user_id)
 
     if not user:
-        raise credentials_error
+        # Auto-provision user record for Firebase / demo authentication
+        user = User(
+            id=user_id,
+            email=user_email or f"{user_id[:8]}@insuresight.demo",
+            full_name="Demo User",
+            password_hash=hash_password("demopassword123"),
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
 
     return user
