@@ -1,6 +1,6 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Eye, EyeOff, AlertCircle, Loader2, Shield, User, Mail, Sparkles, CheckCircle2, FileText, BrainCircuit } from 'lucide-react';
+import { Lock, Eye, EyeOff, AlertCircle, Loader2, Shield, User, Mail, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import Logo from '../components/Logo';
 import { loginUser, signupUser } from '../api';
@@ -98,93 +98,68 @@ export default function Login({ defaultMode = 'signin' }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen bg-canvas-white flex font-sans text-text-primary relative overflow-hidden">
+    <div className="min-h-screen bg-ink flex font-sans text-text relative overflow-hidden">
       
-      {/* Left Side: Product Experience (Deep Navy) */}
-      <div className="hidden lg:flex w-[45%] bg-brand-deep-navy p-12 flex-col justify-between relative overflow-hidden text-canvas-white">
-        {/* Ambient Gradients for Product Context */}
-        <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-brand-ai-purple/20 blur-[120px] rounded-full pointer-events-none"></div>
-        <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-brand-ai-cyan/15 blur-[120px] rounded-full pointer-events-none"></div>
+      {/* Background ambient light */}
+      <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-neon-blue/10 blur-[150px] rounded-full pointer-events-none z-0"></div>
+      <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-neon-blue/5 blur-[120px] rounded-full pointer-events-none z-0"></div>
 
-        <div className="relative z-10 flex items-center gap-2 group w-max">
-          <Link to="/" className="flex items-center gap-2 focus-ring-dark rounded-lg">
-            <Logo size={32} className="text-canvas-white" />
-            <span className="font-bold text-2xl tracking-tight text-canvas-white">NovaNex</span>
+      {/* Decorative Sidebar for Desktop */}
+      <div className="hidden lg:flex w-[45%] border-r border-white/10 p-12 flex-col justify-between relative overflow-hidden bg-white/5 backdrop-blur-3xl z-10">
+        <div className="relative z-10">
+          <Link to="/" className="flex items-center gap-2 group w-max">
+            <Logo size={32} className="group-hover:opacity-90 transition-opacity" />
+            <span className="font-bold text-xl text-text tracking-tight group-hover:text-accent transition-colors">
+              InsureSight
+            </span>
           </Link>
         </div>
         
-        {/* Visual Product Illustration */}
-        <div className="relative z-10 flex-1 flex flex-col justify-center items-center perspective-1000 my-12">
+        {/* Animated 3D element in sidebar */}
+        <div className="relative z-10 flex-1 flex items-center justify-center perspective-1000">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="w-full max-w-sm"
+            initial={{ rotateY: -15, rotateX: 10 }}
+            animate={{ rotateY: [-15, 15, -15], y: [0, -20, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            className="w-72 rounded-2xl border border-neon-blue/30 bg-neon-blue/5 p-6 shadow-[0_0_40px_rgba(56,189,248,0.1)] backdrop-blur-md flex flex-col justify-between"
           >
-            <div className="glass-panel-dark rounded-2xl border border-canvas-white/10 p-6 shadow-2xl relative">
-              {/* Product Card Header */}
-              <div className="flex items-center justify-between mb-6 border-b border-canvas-white/10 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-brand-ai-purple/20 flex items-center justify-center text-brand-ai-purple">
-                    <BrainCircuit className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-canvas-white">Editorial Intelligence</h3>
-                    <p className="text-xs text-canvas-white/60">Policy Analysis Active</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-brand-ai-cyan/10 border border-brand-ai-cyan/20 text-[11px] text-brand-ai-cyan font-semibold tracking-wide">
-                  <Sparkles className="w-3 h-3" /> AI ANALYSIS
-                </div>
+            <div className="flex justify-between items-center mb-6">
+              <div className="w-10 h-10 rounded-xl bg-neon-blue/20 flex items-center justify-center text-neon-blue">
+                <Shield className="w-5 h-5" />
               </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neon-blue/10 border border-neon-blue/20 text-[11px] text-neon-blue font-medium">
+                <Sparkles className="w-3 h-3" /> Secure Auth
+              </div>
+            </div>
 
-              {/* Product Content Layers */}
-              <div className="space-y-4">
-                <div className="bg-canvas-white/5 rounded-xl p-4 border border-canvas-white/5">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Shield className="w-4 h-4 text-status-covered" />
-                    <span className="text-sm font-semibold text-canvas-white">Coverage Overview</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-canvas-white/10 rounded-full overflow-hidden">
-                    <div className="h-full w-[85%] bg-status-covered rounded-full"></div>
-                  </div>
-                </div>
-                
-                <div className="bg-canvas-white/5 rounded-xl p-4 border border-canvas-white/5 relative overflow-hidden">
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-brand-ai-purple"></div>
-                  <div className="flex items-start gap-3">
-                    <FileText className="w-4 h-4 text-brand-ai-purple mt-0.5" />
-                    <div>
-                      <span className="text-sm font-semibold text-canvas-white block mb-1">Clause Extracted</span>
-                      <p className="text-xs text-canvas-white/60 leading-relaxed">
-                        "Pre-existing condition waiting period fully completed as of March 2024."
-                      </p>
-                    </div>
-                  </div>
-                </div>
+            <div className="space-y-3 mb-6">
+              <div className="text-sm font-semibold text-text">NovaNex Verified Protection</div>
+              <p className="text-xs text-muted leading-relaxed">
+                Connect your medical policy documents with instant AI extraction, automated hospital claim checks, and transparent coverage analysis.
+              </p>
+            </div>
+
+            <div className="space-y-2 border-t border-neon-blue/20 pt-4">
+              <div className="flex items-center gap-2 text-xs text-text/80">
+                <CheckCircle2 className="w-3.5 h-3.5 text-neon-blue shrink-0" />
+                <span>Instant Clause & Deductible Extraction</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-text/80">
+                <CheckCircle2 className="w-3.5 h-3.5 text-neon-blue shrink-0" />
+                <span>Real-Time Cashless Hospital Network</span>
               </div>
             </div>
           </motion.div>
         </div>
-
-        <div className="relative z-10 max-w-sm">
-          <h2 className="text-3xl font-bold text-canvas-white mb-4 leading-tight">
-            Understand your policy before it becomes a problem.
-          </h2>
-          <p className="text-canvas-white/70 text-sm leading-relaxed">
-            Join NovaNex to unlock instant clarity on health insurance terms, coverage limits, and claim processes using editorial AI intelligence.
-          </p>
-        </div>
       </div>
 
-      {/* Right Side: Auth Form */}
-      <div className="flex-1 flex flex-col justify-center items-center p-6 md:p-12 relative z-10 w-full lg:w-[55%]">
-        
-        {/* Mobile Header (Hidden on Desktop) */}
+      {/* Main Login / Signup Area */}
+      <div className="flex-1 flex flex-col justify-center items-center p-6 relative z-10">
+        {/* Mobile Wordmark */}
         <div className="absolute top-6 left-6 lg:hidden">
-          <Link to="/" className="flex items-center gap-2 focus-ring rounded-lg">
-            <Logo size={24} className="text-brand-deep-navy" />
-            <span className="font-bold text-lg tracking-tight text-brand-deep-navy">NovaNex</span>
+          <Link to="/" className="flex items-center gap-2">
+            <Logo size={24} />
+            <span className="font-bold text-lg tracking-tight">InsureSight</span>
           </Link>
         </div>
 
@@ -195,27 +170,27 @@ export default function Login({ defaultMode = 'signin' }: LoginProps) {
           className="w-full max-w-[420px]"
         >
           {/* Header */}
-          <div className="mb-8 text-center lg:text-left mt-10 lg:mt-0">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-text-primary mb-2">
-              {mode === 'signup' ? 'Create an account' : 'Welcome back'}
+          <div className="space-y-2 mb-6 text-center lg:text-left">
+            <h1 className="text-3xl font-bold tracking-tight">
+              {mode === 'signup' ? 'Create an Account' : 'Welcome Back'}
             </h1>
-            <p className="text-text-muted text-sm md:text-base font-medium">
+            <p className="text-muted text-sm font-light">
               {mode === 'signup'
-                ? 'Join NovaNex for premium insurance intelligence.'
+                ? 'Join InsureSight to analyze, extract, and track your health policies.'
                 : 'Sign in to access your policies and AI coverage assistant.'}
             </p>
           </div>
 
-          {/* Mode Switcher */}
-          <div className="p-1 mb-8 rounded-xl bg-canvas-secondary border border-border-subtle flex items-center gap-1">
+          {/* Toggle Tabs */}
+          <div className="p-1 mb-6 rounded-xl bg-white/5 border border-white/10 flex items-center gap-1 backdrop-blur-md">
             <button
               type="button"
               id="tab-signin"
               onClick={() => setMode('signin')}
-              className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all focus-ring ${
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
                 mode === 'signin'
-                  ? 'bg-canvas-white text-brand-electric shadow-sm border border-border-subtle'
-                  : 'text-text-muted hover:text-text-primary'
+                  ? 'bg-neon-blue text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]'
+                  : 'text-muted hover:text-text'
               }`}
             >
               Sign In
@@ -224,54 +199,48 @@ export default function Login({ defaultMode = 'signin' }: LoginProps) {
               type="button"
               id="tab-signup"
               onClick={() => setMode('signup')}
-              className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all focus-ring ${
+              className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${
                 mode === 'signup'
-                  ? 'bg-canvas-white text-brand-electric shadow-sm border border-border-subtle'
-                  : 'text-text-muted hover:text-text-primary'
+                  ? 'bg-neon-blue text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]'
+                  : 'text-muted hover:text-text'
               }`}
             >
               Create Account
             </button>
           </div>
 
-          {/* Messages */}
+          {/* Error Message */}
           <AnimatePresence>
             {errorMessage && (
               <motion.div 
-                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
-                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                className="overflow-hidden"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                className="mb-5 p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-3 text-red-400 text-sm"
               >
-                <div className="p-4 bg-status-oop/10 border border-status-oop/20 rounded-xl flex items-start gap-3 text-status-oop text-sm">
-                  <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                  <p className="font-medium leading-relaxed">{errorMessage}</p>
-                </div>
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                <p>{errorMessage}</p>
               </motion.div>
             )}
 
             {successMessage && (
               <motion.div 
-                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
-                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                className="overflow-hidden"
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                className="mb-5 p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center gap-3 text-emerald-400 text-sm"
               >
-                <div className="p-4 bg-status-covered/10 border border-status-covered/20 rounded-xl flex items-start gap-3 text-status-covered text-sm">
-                  <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
-                  <p className="font-medium leading-relaxed">{successMessage}</p>
-                </div>
+                <CheckCircle2 className="w-5 h-5 shrink-0" />
+                <p>{successMessage}</p>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Main Form */}
-          <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-            
+          <form className="space-y-4" onSubmit={handleSubmit}>
             {/* Full Name field (Signup only) */}
             {mode === 'signup' && (
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-text-primary block" htmlFor="fullName">Full Name</label>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-text/80 block" htmlFor="fullName">Full Name</label>
                 <div className="relative">
                   <input 
                     type="text" 
@@ -279,38 +248,38 @@ export default function Login({ defaultMode = 'signin' }: LoginProps) {
                     autoComplete="name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full bg-canvas-white border border-border-subtle rounded-xl px-4 py-3.5 pl-11 text-text-primary text-base focus:outline-none focus:border-brand-electric focus:ring-1 focus:ring-brand-electric transition-all shadow-sm placeholder:text-text-muted/60"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 pl-11 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md"
                     placeholder="John Doe"
                     required
                   />
-                  <User className="w-5 h-5 text-text-muted absolute left-4 top-1/2 -translate-y-1/2" />
+                  <User className="w-4 h-4 text-muted absolute left-4 top-1/2 -translate-y-1/2" />
                 </div>
               </div>
             )}
 
             {/* Email Address */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-text-primary block" htmlFor="email">
-                {mode === 'signup' ? 'Email Address' : 'Email Address / Username'}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-text/80 block" htmlFor="email">
+                {mode === 'signup' ? 'Email Address' : 'Email / Username'}
               </label>
               <div className="relative">
                 <input 
-                  type="email"
+                  type={mode === 'signup' ? 'email' : 'text'}
                   id="email"
                   autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-canvas-white border border-border-subtle rounded-xl px-4 py-3.5 pl-11 text-text-primary text-base focus:outline-none focus:border-brand-electric focus:ring-1 focus:ring-brand-electric transition-all shadow-sm placeholder:text-text-muted/60"
-                  placeholder={mode === 'signup' ? 'name@example.com' : 'name@example.com (or blank for demo)'}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 pl-11 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md"
+                  placeholder={mode === 'signup' ? 'name@example.com' : 'name@example.com (or leave blank for demo)'}
                   required={mode === 'signup'}
                 />
-                <Mail className="w-5 h-5 text-text-muted absolute left-4 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-muted absolute left-4 top-1/2 -translate-y-1/2" />
               </div>
             </div>
             
             {/* Password */}
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-text-primary block" htmlFor="password">Password</label>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-text/80 block" htmlFor="password">Password</label>
               <div className="relative">
                 <input 
                   type={showPassword ? "text" : "password"} 
@@ -318,26 +287,26 @@ export default function Login({ defaultMode = 'signin' }: LoginProps) {
                   autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-canvas-white border border-border-subtle rounded-xl px-4 py-3.5 pl-11 pr-12 text-text-primary text-base focus:outline-none focus:border-brand-electric focus:ring-1 focus:ring-brand-electric transition-all shadow-sm placeholder:text-text-muted/60"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 pl-11 pr-11 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md"
                   placeholder={mode === 'signup' ? 'At least 6 characters' : 'Password (optional for demo)'}
                   required={mode === 'signup'}
                 />
-                <Lock className="w-5 h-5 text-text-muted absolute left-4 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-muted absolute left-4 top-1/2 -translate-y-1/2" />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-text-muted hover:text-text-primary focus-ring rounded-md transition-colors"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted hover:text-text transition-colors flex items-center justify-center"
+                  aria-label="Toggle password visibility"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
             {/* Confirm Password (Signup only) */}
             {mode === 'signup' && (
-              <div className="space-y-2">
-                <label className="text-sm font-bold text-text-primary block" htmlFor="confirmPassword">Confirm Password</label>
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-text/80 block" htmlFor="confirmPassword">Confirm Password</label>
                 <div className="relative">
                   <input 
                     type={showConfirmPassword ? "text" : "password"} 
@@ -345,66 +314,89 @@ export default function Login({ defaultMode = 'signin' }: LoginProps) {
                     autoComplete="new-password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full bg-canvas-white border border-border-subtle rounded-xl px-4 py-3.5 pl-11 pr-12 text-text-primary text-base focus:outline-none focus:border-brand-electric focus:ring-1 focus:ring-brand-electric transition-all shadow-sm placeholder:text-text-muted/60"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 pl-11 pr-11 text-text focus:outline-none focus:border-neon-blue focus:ring-1 focus:ring-neon-blue transition-all backdrop-blur-md"
                     placeholder="Re-enter your password"
                     required
                   />
-                  <Lock className="w-5 h-5 text-text-muted absolute left-4 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-muted absolute left-4 top-1/2 -translate-y-1/2" />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-text-muted hover:text-text-primary focus-ring rounded-md transition-colors"
-                    aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted hover:text-text transition-colors flex items-center justify-center"
+                    aria-label="Toggle confirm password visibility"
                   >
-                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
             )}
 
             {/* Primary Action Button */}
-            <div className="pt-2">
-              <button 
-                type="submit" 
-                id="submit-auth-btn"
-                disabled={loading} 
-                className="w-full bg-brand-electric hover:bg-brand-bright text-canvas-white font-bold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-[0_4px_14px_rgba(37,99,235,0.25)] focus-ring disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : mode === 'signup' ? (
-                  'Create Account'
-                ) : (
-                  'Sign In'
-                )}
-              </button>
-            </div>
+            <button 
+              type="submit" 
+              id="submit-auth-btn"
+              disabled={loading} 
+              className="w-full neon-button justify-center mt-3 disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_4px_20px_rgba(59,130,246,0.3)]"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : mode === 'signup' ? (
+                'Create Account'
+              ) : (
+                'Sign In with Firebase'
+              )}
+            </button>
           </form>
 
           {/* Quick Demo Access Option (in Sign In mode) */}
           {mode === 'signin' && (
-            <div className="mt-6">
-              <div className="relative flex py-4 items-center">
-                <div className="flex-grow border-t border-border-subtle"></div>
-                <span className="shrink-0 mx-4 text-text-muted text-sm font-medium">or</span>
-                <div className="flex-grow border-t border-border-subtle"></div>
-              </div>
-              
+            <div className="mt-4 pt-4 border-t border-white/10 text-center">
               <button
                 type="button"
                 id="demo-access-btn"
                 onClick={handleDemoSignIn}
                 disabled={loading}
-                className="w-full bg-canvas-white hover:bg-canvas-secondary border border-border-subtle text-text-primary font-bold py-3.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 group focus-ring disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full py-2.5 px-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-sm text-text/90 font-medium transition-all flex items-center justify-center gap-2 group"
               >
-                <Sparkles className="w-5 h-5 text-brand-ai-cyan group-hover:rotate-12 transition-transform" />
+                <Sparkles className="w-4 h-4 text-neon-blue group-hover:rotate-12 transition-transform" />
                 <span>Instant Demo Workspace (1-Click)</span>
               </button>
             </div>
           )}
+
+          {/* Bottom Switcher */}
+          <div className="mt-6 text-center text-sm text-muted">
+            {mode === 'signup' ? (
+              <p>
+                Already have an account?{' '}
+                <button
+                  type="button"
+                  id="switch-to-signin"
+                  onClick={() => setMode('signin')}
+                  className="text-neon-blue hover:underline font-medium"
+                >
+                  Sign in
+                </button>
+              </p>
+            ) : (
+              <p>
+                Don't have an account?{' '}
+                <button
+                  type="button"
+                  id="switch-to-signup"
+                  onClick={() => setMode('signup')}
+                  className="text-neon-blue hover:underline font-medium"
+                >
+                  Create one now
+                </button>
+              </p>
+            )}
+          </div>
         </motion.div>
       </div>
 
     </div>
   );
 }
+
+
